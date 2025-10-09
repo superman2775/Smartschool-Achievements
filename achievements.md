@@ -15,7 +15,7 @@
         - 10 taken
     - Taskmaster
         - 50 taken
-    - On fire!
+    - Multitasker
         - 100 taken
 
 - Uploadzone
@@ -27,3 +27,12 @@
         - 25 dingen
     - Upload legend
         - 50 dingen
+
+- Extensies
+    - Big brain
+        - Download Smarter / Smartest Smartschool
+    - Plus plus (help me find better name 4 dis)
+        - Download Smartschool ++
+    - Pranked
+        - Download Smartschool Message
+
