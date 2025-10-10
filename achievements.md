@@ -33,6 +33,15 @@
         - Download Smarter / Smartest Smartschool
     - Plus plus (help me find better name 4 dis)
         - Download Smartschool ++
-    - Pranked
+    - Get pranked
         - Download Smartschool Message
 
+- Smartschool OAuth
+    - Connected
+        - Link je account met 1 ander platform
+    - Networker
+        - Link je account met 5 andere platformen
+    - Interconnected
+        - Link je account met 10 andere platformen
+    - Network legend
+        - Link je account met 15 andere platformen
