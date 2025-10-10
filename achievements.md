@@ -45,3 +45,34 @@
         - Link je account met 10 andere platformen
     - Network legend
         - Link je account met 15 andere platformen
+
+- Notifications
+    - First ping
+        - 1 notfification krijgen
+    - Always informed 
+        - 10 notifications
+    - Pls shut up!
+        - 50 notifications
+    - Notification pro
+        - 100 notifications
+    - Notification master
+        - 200 notifications
+    - Notification monster
+        - 500 (Is this too many???)
+
+- Modules
+    - What's the news?
+        - Check the news
+    - OMG I GOT A MESSAGE!
+        - Check berichten
+    - Fake OneDrive
+        - Check out "mijn documenten"
+    - Who even uses this??
+        - Check Handleiding
+    - 2020 flashback
+        - Check out Online sessies
+    - Failure
+        - Check out Resultaten
+    - Oh no i have homework!
+        - Check the Planner
+
