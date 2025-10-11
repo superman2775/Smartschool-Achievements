@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Smartschool Achievements",
+  "version": "1.0",
+  "description": "Voeg achievements toe aan Smartschool.",
+  "content_scripts": [
+    {
+      "matches": ["https://*.smartschool.be/*"],
+      "js": ["main.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": [],
+  "host_permissions": ["https://*.smartschool.be/*"]
+}
