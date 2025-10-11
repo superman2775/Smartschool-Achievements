@@ -5,7 +5,6 @@
 (function() {
     'use strict';
 
-    // Wacht tot de topnav geladen is
     const waitForNav = setInterval(() => {
         const linksBtnWrapper = document.querySelector('[data-links]');
         const messagesBtn = document.querySelector('.js-btn-messages');
@@ -13,36 +12,44 @@
         if (linksBtnWrapper && messagesBtn) {
             clearInterval(waitForNav);
 
-            // Nieuwe button-wrapper
             const wrapper = document.createElement('div');
             wrapper.className = 'topnav__btn-wrapper';
 
-            // Button zelf
             const button = document.createElement('button');
-            button.className = 'js-btn-custom topnav__btn';
-            button.innerHTML = 'Extra';
+            button.className = 'js-btn-achievements topnav__btn';
+            button.innerHTML = 'Achievements';
             button.setAttribute('aria-haspopup', 'true');
             button.setAttribute('aria-expanded', 'false');
 
-            // Menu-wrapper (popup)
             const menuWrapper = document.createElement('div');
-            menuWrapper.id = 'customMenu';
+            menuWrapper.id = 'achievementsMenu';
             menuWrapper.className = 'topnav__menu-wrapper';
             menuWrapper.tabIndex = -1;
             menuWrapper.hidden = true;
             menuWrapper.role = 'menu';
 
-            // Inhoud van popup
             const menu = document.createElement('div');
-            menu.className = 'topnav__menu topnav__menu--shortcuts';
+            menu.className = 'topnav__menu topnav__menu--shortcuts js-achievements-container';
             menu.innerHTML = `
-                <a href="#" class="topnav__menuitem topnav__menuitem--icon module-news--24" role="menuitem">Item 1</a>
-                <a href="#" class="topnav__menuitem topnav__menuitem--icon module-results--24" role="menuitem">Item 2</a>
-                <a href="#" class="topnav__menuitem topnav__menuitem--icon module-planner--24" role="menuitem">Item 3</a>
+                <div class="topnav__menu__hdr">
+                    <h2 class="topnav__menu__title" style="margin-left:10px;">Achievements</h2>
+                </div>
+                <a href="#" class="topnav__menuitem topnav__menuitem--icon module-results--24" role="menuitem">
+                    🏅 Eerste 10 taken ingeleverd
+                </a>
+                <a href="#" class="topnav__menuitem topnav__menuitem--icon module-planner--24" role="menuitem">
+                    📚 100 keer ingelogd
+                </a>
+                <a href="#" class="topnav__menuitem topnav__menuitem--icon module-news--24" role="menuitem">
+                    💬 5 berichten verstuurd
+                </a>
+                <hr class="menu-divider">
+                <a href="#" class="topnav__menuitem topnav__menuitem--icon module-manual--24" role="menuitem">
+                    Bekijk alle achievements
+                </a>
             `;
             menuWrapper.appendChild(menu);
 
-            // Toggle gedrag (zoals “Ga naar”)
             button.addEventListener('click', () => {
                 const isOpen = !menuWrapper.hidden;
                 document.querySelectorAll('.topnav__menu-wrapper').forEach(el => el.hidden = true);
@@ -50,7 +57,6 @@
                 button.setAttribute('aria-expanded', String(!isOpen));
             });
 
-            // Klik buiten popup = sluiten
             document.addEventListener('click', (e) => {
                 if (!wrapper.contains(e.target)) {
                     menuWrapper.hidden = true;
@@ -58,10 +64,10 @@
                 }
             });
 
-            // Plaats de knop tussen Links en Berichten
             messagesBtn.parentNode.insertBefore(wrapper, messagesBtn);
             wrapper.appendChild(button);
             wrapper.appendChild(menuWrapper);
         }
     }, 200);
 })();
+
