@@ -76,3 +76,14 @@
     - Oh no i have homework!
         - Check the Planner
 
+- Opening files
+    - File explorer
+        - Open 1 file
+    - File user
+        - Open 10 files
+    - File ninja 
+        - Open 25 files
+    - File monster
+        - Open 50 files
+    - Final boss of opening files
+        - Open 100 files
