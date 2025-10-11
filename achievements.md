@@ -35,6 +35,8 @@
         - Download Smartschool ++
     - Get pranked
         - Download Smartschool Message
+    - 200 xp
+        - Download Smartschool Achievements
 
 - Smartschool OAuth
     - Connected
@@ -87,3 +89,19 @@
         - Open 50 files
     - Final boss of opening files
         - Open 100 files
+
+- Logging in
+    - Welcome!
+        - Use login 1 time
+    - Remember password?
+        - Use login 5 times
+    - And we are back again!
+        - Use login 25 times
+    - Becoming a routine
+        - Use login 50 times
+    - Again and again
+        - Use login 100 times
+    - Ah sh*t, here we go again
+        - Use login 250 times
+    - THIS PLATFORM IS FREAKING ME OUT
+        - Use login 500 times
