@@ -1,5 +1,27 @@
-# Smartschool-Achievements
-Extension to give ur Smartschool some achievements. WORK IN PROGRESS
+<h1 align="center" id="title">Smartschool Achievements</h1>
+
+<p align=center id="description">I am trying to intergate achievements here. Work in progress!</p>
 
 
-not to myself: https://martinusasse.smartschool.be/results/api/v1/evaluations/?pageNumber=1&itemsOnPage=50&startDate=2024-09-01&endDate=2026-08-31
+  
+  
+<h2>🧐 Features</h2>
+
+Here're some of the project's best features:
+
+*   Failures
+*   Finishing tasks
+*   Uploading Stuff
+*   Authorising with Smartschool
+*   Getting notifications
+*   Checking the Smartschool modules
+*   Opening files
+*   Logging in
+
+<h2>🍰 Contribution Guidelines:</h2>
+
+Anyone can help just make sure to join our Discord!
+
+<h2>💖Like my work?</h2>
+
+Join our Discord here:<p>https://discord.gg/upmbz82Ffb</p>

@@ -60,8 +60,7 @@
             /* {
                     title: "Some random title",
                     desc: "Some random description.",
-                    progress: value,
-                    status: "bezig" (still needs to be automated)
+                    progress: value
                 }, */
             const achievements = [
                 {
