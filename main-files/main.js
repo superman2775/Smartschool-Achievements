@@ -67,38 +67,32 @@
                 {
                     title: "🏅 Eerste 10 taken ingeleverd",
                     desc: "Lever tien opdrachten in om deze badge te verdienen.",
-                    progress: 80,
-                    status: "bezig"
+                    progress: 80
                 },
                 {
                     title: "📚 100 keer ingelogd",
                     desc: "Je bent een vaste bezoeker van Smartschool.",
-                    progress: 100,
-                    status: "voltooid"
+                    progress: 100
                 },
                 {
                     title: "💬 5 berichten verstuurd",
                     desc: "Gebruik het berichtenplatform actief om te communiceren.",
-                    progress: 100,
-                    status: "voltooid"
+                    progress: 100
                 },
                 {
                     title: "🎯 20 lessen gevolgd",
                     desc: "Voltooi twintig lesmodules in het leerplatform.",
-                    progress: 30,
-                    status: "bezig"
+                    progress: 30
                 },
                 {
                     title: "🧠 50 quizzen voltooid",
                     desc: "Behaal een score in vijftig verschillende quizzen.",
-                    progress: 0,
-                    status: "vergrendeld"
+                    progress: 0
                 },
                 {
                     title: "🚀 Actief in 5 vakken",
                     desc: "Werk regelmatig in minstens vijf verschillende vakken.",
-                    progress: 60,
-                    status: "bezig"
+                    progress: 60
                 }
             ];
 
@@ -126,30 +120,32 @@
                 title.style.marginBottom = '4px';
                 topRow.appendChild(title);
 
+                // Automatische status op basis van progress
                 const status = document.createElement('span');
-                status.style.fontSize = '0.8rem';
-                status.style.fontWeight = '500';
-                status.style.padding = '2px 6px';
-                status.style.borderRadius = '4px';
-                status.style.textTransform = 'capitalize';
-                status.style.marginLeft = '8px';
-                status.style.color = '#fff';
-                status.style.userSelect = 'none';
+                    status.style.fontSize = '0.8rem';
+                    status.style.fontWeight = '500';
+                    status.style.padding = '2px 6px';
+                    status.style.borderRadius = '4px';
+                    status.style.textTransform = 'capitalize';
+                    status.style.marginLeft = '8px';
+                    status.style.color = '#fff';
+                    status.style.userSelect = 'none';
 
-                if (a.status === "voltooid") {
-                    status.textContent = "✅ Voltooid";
-                    status.style.background = '#43a047';
-                } else if (a.status === "bezig") {
-                    status.textContent = "🔸 Bezig";
-                    status.style.background = '#f57c00';
-                } else {
-                    status.textContent = "🔒 Vergrendeld";
-                    status.style.background = '#757575';
-                }
+                    if (a.progress >= 100) {
+                        status.textContent = "✅ Voltooid";
+                        status.style.background = '#43a047';
+                    } else if (a.progress <= 0) {
+                        status.textContent = "🔒 Vergrendeld";
+                        status.style.background = '#757575';
+                    } else {
+                        status.textContent = "⏳ Bezig";
+                        status.style.background = '#f57c00';
+                    }
 
-                topRow.appendChild(status);
+                    topRow.appendChild(status);
+
                 item.appendChild(topRow);
-
+                
                 // Beschrijving
                 const desc = document.createElement('span');
                 desc.textContent = a.desc;
@@ -172,9 +168,14 @@
                 bar.style.height = '100%';
                 bar.style.width = `${a.progress}%`;
                 bar.style.background =
-                    a.status === 'voltooid'
-                        ? 'linear-gradient(90deg, #2e7d32, #43a047)'
-                        : 'linear-gradient(90deg, #f57c00, #ffa726)';
+                // Kleur aanpassen op basis van status
+                bar.style.background =
+                    a.progress >= 100
+                        ? 'linear-gradient(90deg, #2e7d32, #43a047)' // Groen bij voltooid
+                        : a.progress <= 0
+                        ? '#bdbdbd' // Grijs bij vergrendeld
+                        : 'linear-gradient(90deg, #f57c00, #ffa726)'; // Oranje bij bezig
+                
                 bar.style.transition = 'width 0.3s ease';
 
                 barContainer.appendChild(bar);
