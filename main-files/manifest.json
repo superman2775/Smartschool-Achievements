@@ -6,7 +6,7 @@
   "content_scripts": [
     {
       "matches": ["https://*.smartschool.be/*"],
-      "js": ["main.js"],
+      "js": ["buis.js","main.js"],
       "run_at": "document_end"
     }
   ],

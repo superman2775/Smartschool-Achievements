@@ -56,156 +56,184 @@
             scrollContainer.style.paddingRight = '4px';
 
             // Achievement data
-            //How to make achievements:
-            /* {
-                    title: "Some random title",
-                    desc: "Some random description.",
-                    progress: value
-                }, */
-            const achievements = [
-                {
-                    title: "🏅 Eerste 10 taken ingeleverd",
-                    desc: "Lever tien opdrachten in om deze badge te verdienen.",
-                    progress: 80
-                },
-                {
-                    title: "📚 100 keer ingelogd",
-                    desc: "Je bent een vaste bezoeker van Smartschool.",
-                    progress: 100
-                },
-                {
-                    title: "💬 5 berichten verstuurd",
-                    desc: "Gebruik het berichtenplatform actief om te communiceren.",
-                    progress: 100
-                },
-                {
-                    title: "🎯 20 lessen gevolgd",
-                    desc: "Voltooi twintig lesmodules in het leerplatform.",
-                    progress: 30
-                },
-                {
-                    title: "🧠 50 quizzen voltooid",
-                    desc: "Behaal een score in vijftig verschillende quizzen.",
-                    progress: 0
-                },
-                {
-                    title: "🚀 Actief in 5 vakken",
-                    desc: "Werk regelmatig in minstens vijf verschillende vakken.",
-                    progress: 60
-                }
-            ];
-
-            achievements.forEach(a => {
-                const item = document.createElement('div');
-                item.className = 'achievement-item topnav__menuitem';
-                item.style.display = 'flex';
-                item.style.flexDirection = 'column';
-                item.style.alignItems = 'flex-start';
-                item.style.width = '100%';
-                item.style.padding = '10px 14px';
-                item.style.boxSizing = 'border-box';
-                item.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
-
-                // Titelrij met status rechts
-                const topRow = document.createElement('div');
-                topRow.style.display = 'flex';
-                topRow.style.justifyContent = 'space-between';
-                topRow.style.alignItems = 'center';
-                topRow.style.width = '100%';
-
-                const title = document.createElement('span');
-                title.textContent = a.title;
-                title.style.fontWeight = '600';
-                title.style.marginBottom = '4px';
-                topRow.appendChild(title);
-
-                // Automatische status op basis van progress
-                const status = document.createElement('span');
-                    status.style.fontSize = '0.8rem';
-                    status.style.fontWeight = '500';
-                    status.style.padding = '2px 6px';
-                    status.style.borderRadius = '4px';
-                    status.style.textTransform = 'capitalize';
-                    status.style.marginLeft = '8px';
-                    status.style.color = '#fff';
-                    status.style.userSelect = 'none';
-
-                    if (a.progress >= 100) {
-                        status.textContent = "✅ Voltooid";
-                        status.style.background = '#43a047';
-                    } else if (a.progress <= 0) {
-                        status.textContent = "🔒 Vergrendeld";
-                        status.style.background = '#757575';
-                    } else {
-                        status.textContent = "⏳ Bezig";
-                        status.style.background = '#f57c00';
+            chrome.storage.local.get("buizenCount", (result) => {
+                const buizen = result.buizenCount || 0;
+                //How to make achievements:
+                /* {
+                        title: "Some random title",
+                        desc: "Some random description.",
+                        progress: value
+                    }, */
+                const achievements = [
+                    {
+                        title: "😩 One of many",
+                        desc: "Buis op 1 toets.",
+                        progress: Math.min((buizen / 1) * 100, 100),
+                    },
+                    {
+                        title: "😩 Five of many",
+                        desc: "Buis op 5 toetsen.",
+                        progress: Math.min((buizen / 5) * 100, 100),
+                    },
+                    {
+                        title: "😩 Ten of many",
+                        desc: "Buis op 10 toetsen.",
+                        progress: Math.min((buizen / 10) * 100, 100),
+                    },
+                    {
+                        title: "😩 Twenty-five of many",
+                        desc: "Buis op 25 toetsen.",
+                        progress: Math.min((buizen / 25) * 100, 100),
+                    },
+                    {
+                        title: "😩 Just too many",
+                        desc: "Buis op 50 toetsen.",
+                        progress: Math.min((buizen / 50) * 100, 100),
+                    },
+                    {
+                        title: "😩 Way too many",
+                        desc: "Buis op 100 toetsen.",
+                        progress: Math.min((buizen / 100) * 100, 100),
+                    },
+                    {
+                        title: "📚 100 keer ingelogd",
+                        desc: "Je bent een vaste bezoeker van Smartschool.",
+                        progress: 100
+                    },
+                    {
+                        title: "💬 5 berichten verstuurd",
+                        desc: "Gebruik het berichtenplatform actief om te communiceren.",
+                        progress: 100
+                    },
+                    {
+                        title: "🎯 20 lessen gevolgd",
+                        desc: "Voltooi twintig lesmodules in het leerplatform.",
+                        progress: 30
+                    },
+                    {
+                        title: "🧠 50 quizzen voltooid",
+                        desc: "Behaal een score in vijftig verschillende quizzen.",
+                        progress: 0
+                    },
+                    {
+                        title: "🚀 Actief in 5 vakken",
+                        desc: "Werk regelmatig in minstens vijf verschillende vakken.",
+                        progress: 60
                     }
+                ];
 
-                    topRow.appendChild(status);
+                achievements.forEach(a => {
+                    const item = document.createElement('div');
+                    item.className = 'achievement-item topnav__menuitem';
+                    item.style.display = 'flex';
+                    item.style.flexDirection = 'column';
+                    item.style.alignItems = 'flex-start';
+                    item.style.width = '100%';
+                    item.style.padding = '10px 14px';
+                    item.style.boxSizing = 'border-box';
+                    item.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
 
-                item.appendChild(topRow);
-                
-                // Beschrijving
-                const desc = document.createElement('span');
-                desc.textContent = a.desc;
-                desc.style.fontSize = '0.85rem';
-                desc.style.color = '#666';
-                desc.style.marginBottom = '8px';
-                desc.style.marginTop = '4px';
-                desc.style.lineHeight = '1.3';
-                item.appendChild(desc);
+                    // Titelrij met status rechts
+                    const topRow = document.createElement('div');
+                    topRow.style.display = 'flex';
+                    topRow.style.justifyContent = 'space-between';
+                    topRow.style.alignItems = 'center';
+                    topRow.style.width = '100%';
 
-                // Voortgangsbalk
-                const barContainer = document.createElement('div');
-                barContainer.style.width = '100%';
-                barContainer.style.height = '8px';
-                barContainer.style.borderRadius = '4px';
-                barContainer.style.background = '#e0e0e0';
-                barContainer.style.overflow = 'hidden';
+                    const title = document.createElement('span');
+                    title.textContent = a.title;
+                    title.style.fontWeight = '600';
+                    title.style.marginBottom = '4px';
+                    topRow.appendChild(title);
 
-                const bar = document.createElement('div');
-                bar.style.height = '100%';
-                bar.style.width = `${a.progress}%`;
-                bar.style.background =
-                // Kleur aanpassen op basis van status
-                bar.style.background =
-                    a.progress >= 100
-                        ? 'linear-gradient(90deg, #2e7d32, #43a047)' // Groen bij voltooid
-                        : a.progress <= 0
-                        ? '#bdbdbd' // Grijs bij vergrendeld
-                        : 'linear-gradient(90deg, #f57c00, #ffa726)'; // Oranje bij bezig
-                
-                bar.style.transition = 'width 0.3s ease';
+                    // Automatische status op basis van progress
+                    const status = document.createElement('span');
+                        status.style.fontSize = '0.8rem';
+                        status.style.fontWeight = '500';
+                        status.style.padding = '2px 6px';
+                        status.style.borderRadius = '4px';
+                        status.style.textTransform = 'capitalize';
+                        status.style.marginLeft = '8px';
+                        status.style.color = '#fff';
+                        status.style.userSelect = 'none';
 
-                barContainer.appendChild(bar);
-                item.appendChild(barContainer);
+                        if (a.progress >= 100) {
+                            status.textContent = "✅ Voltooid";
+                            status.style.background = '#43a047';
+                        } else if (a.progress <= 0) {
+                            status.textContent = "🔒 Vergrendeld";
+                            status.style.background = '#757575';
+                        } else {
+                            status.textContent = "⏳ Bezig";
+                            status.style.background = '#f57c00';
+                        }
 
-                scrollContainer.appendChild(item);
-            });
+                        topRow.appendChild(status);
 
-            menu.appendChild(scrollContainer);
-            menuWrapper.appendChild(menu);
+                    item.appendChild(topRow);
+                    
+                    // Beschrijving
+                    const desc = document.createElement('span');
+                    desc.textContent = a.desc;
+                    desc.style.fontSize = '0.85rem';
+                    desc.style.color = '#666';
+                    desc.style.marginBottom = '8px';
+                    desc.style.marginTop = '4px';
+                    desc.style.lineHeight = '1.3';
+                    item.appendChild(desc);
 
-            // Toggle open/sluiten
-            button.addEventListener('click', () => {
-                const isOpen = !menuWrapper.hidden;
-                document.querySelectorAll('.topnav__menu-wrapper').forEach(el => el.hidden = true);
-                menuWrapper.hidden = isOpen;
-                button.setAttribute('aria-expanded', String(!isOpen));
-            });
+                    // Voortgangsbalk
+                    const barContainer = document.createElement('div');
+                    barContainer.style.width = '100%';
+                    barContainer.style.height = '8px';
+                    barContainer.style.borderRadius = '4px';
+                    barContainer.style.background = '#e0e0e0';
+                    barContainer.style.overflow = 'hidden';
 
-            // Klik buiten popup = sluiten
-            document.addEventListener('click', (e) => {
-                if (!wrapper.contains(e.target)) {
-                    menuWrapper.hidden = true;
-                    button.setAttribute('aria-expanded', 'false');
-                }
-            });
+                    const bar = document.createElement('div');
+                    bar.style.height = '100%';
+                    bar.style.width = `${a.progress}%`;
+                    bar.style.background =
+                    // Kleur aanpassen op basis van status
+                    bar.style.background =
+                        a.progress >= 100
+                            ? 'linear-gradient(90deg, #2e7d32, #43a047)' // Groen bij voltooid
+                            : a.progress <= 0
+                            ? '#bdbdbd' // Grijs bij vergrendeld
+                            : 'linear-gradient(90deg, #f57c00, #ffa726)'; // Oranje bij bezig
+                    
+                    bar.style.transition = 'width 0.3s ease';
 
-            // Voeg knop toe tussen “Links” en “Berichten”
-            messagesBtn.parentNode.insertBefore(wrapper, messagesBtn);
-            wrapper.appendChild(button);
-            wrapper.appendChild(menuWrapper);
+                    barContainer.appendChild(bar);
+                    item.appendChild(barContainer);
+
+                    scrollContainer.appendChild(item);
+                });
+
+                menu.appendChild(scrollContainer);
+                menuWrapper.appendChild(menu);
+
+                // Toggle open/sluiten
+                button.addEventListener('click', () => {
+                    const isOpen = !menuWrapper.hidden;
+                    document.querySelectorAll('.topnav__menu-wrapper').forEach(el => el.hidden = true);
+                    menuWrapper.hidden = isOpen;
+                    button.setAttribute('aria-expanded', String(!isOpen));
+                });
+
+                // Klik buiten popup = sluiten
+                document.addEventListener('click', (e) => {
+                    if (!wrapper.contains(e.target)) {
+                        menuWrapper.hidden = true;
+                        button.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                // Voeg knop toe tussen “Links” en “Berichten”
+                messagesBtn.parentNode.insertBefore(wrapper, messagesBtn);
+                wrapper.appendChild(button);
+                wrapper.appendChild(menuWrapper);
+            }); // <-- Close chrome.storage.local.get callback here
         }
     }, 200);
 })();

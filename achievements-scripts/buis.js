@@ -30,6 +30,10 @@ setTimeout(function () {
             }
           }
         });
+        // Sla op in storage zodat andere scripts het kunnen lezen
+        chrome.storage.local.set({ buizenCount: buizen }, () => {
+          console.log("[Achievements] buizenCount opgeslagen in storage");
+        });
       })
       .catch((error) => console.error("Error fetching:", error));
   }
