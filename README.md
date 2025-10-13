@@ -7,7 +7,7 @@
   
 <h2>🧐 Features</h2>
 
-Here're some of the project's best features:
+Here are the kind of achievements you can get:
 
 *   Failures
 *   Finishing tasks
