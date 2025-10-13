@@ -1,6 +1,3 @@
-// This is very not working rn, cuz i copy pasted it from smpp bruh
-// rn it just checks if it is a buis or not.
-// I also changed https://${subdomain}.smartschool.be/results/api/v1/evaluations/?itemsOnPage=100 to https://${subdomain}.smartschool.be/results/api/v1/evaluations/?itemsOnPage=1000000000
 setTimeout(function () {
   if (window.location.pathname.startsWith("/")) {
     const getSubdomain = () => {
@@ -10,17 +7,25 @@ setTimeout(function () {
     };
 
     const subdomain = getSubdomain();
-    const url = `https://${subdomain}.smartschool.be/results/api/v1/evaluations/?pageNumber=1&itemsOnPage=100000000&startDate=2015-09-01&endDate=2035-08-31`;
+    const url = `https://${subdomain}.smartschool.be/results/api/v1/evaluations/?pageNumber=1&itemsOnPage=500&startDate=2015-09-01&endDate=2035-08-31`;
 
     fetch(url)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) throw new Error("Network response was not ok");
+        return response.json();
+      })
       .then((data) => {
         const categories = {
           buis: 0,
           voldoende: 0,
         };
 
-        data.forEach((evaluation) => {
+        // Probeer array te vinden
+        const evaluations = Array.isArray(data)
+          ? data
+          : data.items || data.evaluations || [];
+
+        evaluations.forEach((evaluation) => {
           if (evaluation.graphic && evaluation.graphic.value !== undefined) {
             const value = evaluation.graphic.value;
             if (value < 50) {
@@ -30,8 +35,9 @@ setTimeout(function () {
             }
           }
         });
+
         // Sla op in storage zodat andere scripts het kunnen lezen
-        chrome.storage.local.set({ buizenCount: buizen }, () => {
+        chrome.storage.local.set({ buizenCount: categories.buis }, () => {
           console.log("[Achievements] buizenCount opgeslagen in storage");
         });
       })
