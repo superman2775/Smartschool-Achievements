@@ -8,10 +8,11 @@
       "matches": ["https://*.smartschool.be/*"],
       "js": [
         "achievements-scripts/buis.js",
-        "main-files/main.js"],
+        "main-files/main.js"
+      ],
       "run_at": "document_end"
     }
   ],
-  "permissions": [],
+  "permissions": ["storage"],
   "host_permissions": ["https://*.smartschool.be/*"]
 }
