@@ -56,6 +56,13 @@
             scrollContainer.style.paddingRight = '4px';
 
             // Achievement data
+            //How to make achievements:
+            /* {
+                    title: "Some random title",
+                    desc: "Some random description.",
+                    progress: value,
+                    status: "bezig" (still needs to be automated)
+                }, */
             const achievements = [
                 {
                     title: "🏅 Eerste 10 taken ingeleverd",

@@ -10,7 +10,7 @@ setTimeout(function () {
     };
 
     const subdomain = getSubdomain();
-    const url = `https://${subdomain}.smartschool.be/results/api/v1/evaluations/?itemsOnPage=1000000000`;
+    const url = `https://${subdomain}.smartschool.be/results/api/v1/evaluations/?pageNumber=1&itemsOnPage=100000000&startDate=2015-09-01&endDate=2035-08-31`;
 
     fetch(url)
       .then((response) => response.json())
