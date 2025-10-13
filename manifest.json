@@ -7,7 +7,7 @@
     {
       "matches": ["https://*.smartschool.be/*"],
       "js": [
-        "achievement-scripts/buis.js",
+        "achievements-scripts/buis.js",
         "main-files/main.js"],
       "run_at": "document_end"
     }
