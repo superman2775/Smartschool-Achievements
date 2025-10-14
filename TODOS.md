@@ -1,5 +1,3 @@
 - Streaks
 - Leaderboards
-- Make a popup window
 - Make notifications when you reach achievement
-- Make achievements go automaticly (add the achievements for that)
