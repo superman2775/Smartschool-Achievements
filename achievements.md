@@ -105,3 +105,17 @@
         - Use login 250 times
     - THIS PLATFORM IS FREAKING ME OUT
         - Use login 500 times
+
+- 100% op toets
+    - Beginners luck
+        - Krijg 1 keer 100% op een toets
+    - Lucky
+        - 5 keer
+    - Teacher loves me ig
+        - 10 keer
+    - Big brain
+        - 25 keer
+    - Teachers pet
+        - 50 keer
+    - Nerd
+        - 100 keer
