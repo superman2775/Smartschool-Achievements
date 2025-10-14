@@ -119,3 +119,15 @@
         - 50 keer
     - Nerd
         - 100 keer
+
+- Afwezigheden
+    - Just sick
+        - 1 keer afwezig
+    - Bus didn't drive today
+        - 5 keer afwezig
+    - Ghost mode
+        - 10 keer afwezig
+    - Ninja vanish
+        - 25 keer afwezig
+    - Phantom
+        - 50 keer afwezig

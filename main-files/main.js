@@ -139,8 +139,8 @@ Author: @superman2775
                         progress: Math.min((hundredPercent / 1000) * 100, 100),
                     }, // no way someone has 1000 100%'s wth
                     {
-                        title: "📚 100 keer ingelogd",
-                        desc: "Je bent een vaste bezoeker van Smartschool.",
+                        title: "⬇️ + 200 XP!",
+                        desc: "Download Smartschool Achievements.",
                         progress: 100
                     },
                     {
