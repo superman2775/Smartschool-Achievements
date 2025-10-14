@@ -110,29 +110,34 @@ Author: @superman2775
                     },
                     {
                         title: "🤓 Just lucky",
-                        desc: "Haal 100% op 10 toetsen.",
-                        progress: Math.min((hundredPercent / 10) * 100, 100),
+                        desc: "Haal 100% op 20 toetsen.",
+                        progress: Math.min((hundredPercent / 20) * 100, 100),
                     },
                     {
                         title: "🤓 Teacher loves me ig",
-                        desc: "Haal 100% op 25 toetsen.",
-                        progress: Math.min((hundredPercent / 25) * 100, 100),
-                    },
-                    {
-                        title: "🤓 Big brain",
                         desc: "Haal 100% op 50 toetsen.",
                         progress: Math.min((hundredPercent / 50) * 100, 100),
                     },
                     {
-                        title: "🤓 Teacher's pet",
+                        title: "🤓 Big brain",
                         desc: "Haal 100% op 100 toetsen.",
                         progress: Math.min((hundredPercent / 100) * 100, 100),
                     },
                     {
-                        title: "🤓 Nerd",
+                        title: "🤓 Teacher's pet",
                         desc: "Haal 100% op 250 toetsen.",
                         progress: Math.min((hundredPercent / 250) * 100, 100),
                     },
+                    {
+                        title: "🤓 Nerd",
+                        desc: "Haal 100% op 500 toetsen.",
+                        progress: Math.min((hundredPercent / 500) * 100, 100),
+                    },
+                    {
+                        title: "🤓 No life 💀",
+                        desc: "Haal 100% op 1000 toetsen.",
+                        progress: Math.min((hundredPercent / 1000) * 100, 100),
+                    }, // no way someone has 1000 100%'s wth
                     {
                         title: "📚 100 keer ingelogd",
                         desc: "Je bent een vaste bezoeker van Smartschool.",
