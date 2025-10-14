@@ -20,10 +20,7 @@ setTimeout(function () {
         return response.json();
       })
       .then((data) => {
-        const categories = {
-          buis: 0,
-          voldoende: 0,
-        };
+        let hundredPercentCount = 0;
 
         // Probeer array te vinden
         const evaluations = Array.isArray(data)
@@ -31,19 +28,16 @@ setTimeout(function () {
           : data.items || data.evaluations || [];
 
         evaluations.forEach((evaluation) => {
-          if (evaluation.graphic && evaluation.graphic.value !== undefined) {
-            const value = evaluation.graphic.value;
-            if (value < 50) {
-              categories.buis++;
-            } else {
-              categories.voldoende++;
+          if (evaluation.graphic && typeof evaluation.graphic.value === "number") {
+            if (evaluation.graphic.value === 100) {
+              hundredPercentCount++;
             }
           }
         });
 
         // Sla op in storage zodat andere scripts het kunnen lezen
-        chrome.storage.local.set({ buizenCount: categories.buis }, () => {
-          console.log("[Achievements] buizenCount opgeslagen in storage");
+        chrome.storage.local.set({ hundredPercentCount }, () => {
+          console.log("[Achievements] hundredPercentCount opgeslagen in storage");
         });
       })
       .catch((error) => console.error("Error fetching:", error));

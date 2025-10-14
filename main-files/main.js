@@ -1,3 +1,9 @@
+/* This file is part of Smartschool Achievements.
+Don't use this file without permission
+Author: @superman2775
+*/
+
+
 //JavaScript here.
 
 (function() {
@@ -58,6 +64,8 @@
             // Achievement data
             chrome.storage.local.get("buizenCount", (result) => {
                 const buizen = result.buizenCount || 0;
+            chrome.storage.local.get("hundredPercentCount", (result) => {
+                const hundredPercent = result.hundredPercentCount || 0;
                 //How to make achievements:
                 /* {
                         title: "Some random title",
@@ -94,6 +102,36 @@
                         title: "😩 Way too many",
                         desc: "Buis op 100 toetsen.",
                         progress: Math.min((buizen / 100) * 100, 100),
+                    },
+                    {
+                        title: "🤓 Beginners luck",
+                        desc: "Haal 100% op 1 toets.",
+                        progress: Math.min((hundredPercent / 1) * 100, 100),
+                    },
+                    {
+                        title: "🤓 Just lucky",
+                        desc: "Haal 100% op 10 toetsen.",
+                        progress: Math.min((hundredPercent / 10) * 100, 100),
+                    },
+                    {
+                        title: "🤓 Teacher loves me ig",
+                        desc: "Haal 100% op 25 toetsen.",
+                        progress: Math.min((hundredPercent / 25) * 100, 100),
+                    },
+                    {
+                        title: "🤓 Big brain",
+                        desc: "Haal 100% op 50 toetsen.",
+                        progress: Math.min((hundredPercent / 50) * 100, 100),
+                    },
+                    {
+                        title: "🤓 Teacher's pet",
+                        desc: "Haal 100% op 100 toetsen.",
+                        progress: Math.min((hundredPercent / 100) * 100, 100),
+                    },
+                    {
+                        title: "🤓 Nerd",
+                        desc: "Haal 100% op 250 toetsen.",
+                        progress: Math.min((hundredPercent / 250) * 100, 100),
                     },
                     {
                         title: "📚 100 keer ingelogd",
@@ -233,6 +271,7 @@
                 messagesBtn.parentNode.insertBefore(wrapper, messagesBtn);
                 wrapper.appendChild(button);
                 wrapper.appendChild(menuWrapper);
+                });
             }); // <-- Close chrome.storage.local.get callback here
         }
     }, 200);

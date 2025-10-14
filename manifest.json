@@ -1,3 +1,4 @@
+
 {
   "manifest_version": 3,
   "name": "Smartschool Achievements",
@@ -7,6 +8,7 @@
     {
       "matches": ["https://*.smartschool.be/*"],
       "js": [
+        "achievements-scripts/hunderd-percent.js",
         "achievements-scripts/buis.js",
         "main-files/main.js"
       ],
