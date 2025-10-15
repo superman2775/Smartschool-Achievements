@@ -176,6 +176,11 @@ Author: @superman2775 +@broodje565
                         progress: Math.min((apiAssignmentFinishCallCount / 500) * 100, 100),
                     },
                     {
+                        title: "✅ Task god",
+                        desc: "Werk 1000 taken af.",
+                        progress: Math.min((apiAssignmentFinishCallCount / 1000) * 100, 100),
+                    },
+                    {
                         title: "🎯 20 lessen gevolgd",
                         desc: "Voltooi twintig lesmodules in het leerplatform.",
                         progress: 30
