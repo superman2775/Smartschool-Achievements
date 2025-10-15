@@ -8,8 +8,7 @@
   },
   "permissions": [
     "storage",
-    "webRequest",
-    "webRequestBlocking"
+    "webRequest"
   ],
   "host_permissions": [
     "https://*.smartschool.be/*"
