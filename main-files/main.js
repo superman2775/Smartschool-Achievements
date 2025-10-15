@@ -139,7 +139,7 @@ Author: @superman2775 +@broodje565
                         title: "🤓 No life 💀",
                         desc: "Haal 100% op 1000 toetsen.",
                         progress: Math.min((hundredPercent / 1000) * 100, 100),
-                    }, // no way someone has 1000 100%'s wth
+                    },
                     {
                         title: "⬇️ + 200 XP!",
                         desc: "Download Smartschool Achievements.",
@@ -192,10 +192,25 @@ Author: @superman2775 +@broodje565
                     },
                     {
                         title: "🚀 Actief in 5 vakken",
-                        desc: "Werk regelmatig in minstens vijf verschillende vakken.",
-                        progress: 60
+                        desc: "Werk in minstens vijf verschillende vakken.",
+                        progress: 60,
+                        secret: true // 👈 Dit is een geheim achievement
+                    },
+                    {
+                        title: "🏆 De ultieme student",
+                        desc: "Ontgrendel alle andere achievements.",
+                        progress: 0,
+                        secret: true // 👈 Ook geheim
                     }
                 ];
+
+                // Verwerk geheime achievements
+                achievements.forEach(a => {
+                    if (a.secret && a.progress < 100) {
+                        a.title = "❓ Secret";
+                        a.desc = "Wordt onthuld zodra voltooid.";
+                    }
+                });
 
                 achievements.forEach(a => {
                     const item = document.createElement('div');
