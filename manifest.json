@@ -6,10 +6,12 @@
   "description": "Voeg achievements toe aan Smartschool.",
   "content_scripts": [
     {
-      "matches": ["https://*.smartschool.be/*"],
+      "matches": ["*://*.smartschool.be/*"],
+      "exclude_matches": ["*://*.smartschool.be/login"], 
       "js": [
         "achievements-scripts/hunderd-percent.js",
         "achievements-scripts/buis.js",
+        "achievements-scripts/assignment-finish.js",
         "main-files/main.js"
       ],
       "run_at": "document_end"

@@ -3,20 +3,35 @@ Don't use this file without permission
 Author: @superman2775
 */
 
-//This is verrrry temporary. It won't work probably
-(function() {
-  let apiCallCount = 0;
-  const originalFetch = window.fetch;
-  window.fetch = function(...args) {
-    const url = args[0];
-    if (
-      typeof url === 'string' &&
-      url.startsWith('https://martinusasse.smartschool.be/planner/api/v1/planned-assignments/') &&
-      url.endsWith('/resolve')
-    ) {
-      apiCallCount++;
-      console.log('API Call Count:', apiCallCount);
-    }
-    return originalFetch.apply(this, args);
-  };
-})();
+//This now works ig
+setTimeout(function () {
+  if (window.location.pathname.startsWith("/")) {
+    const getSubdomain = () => {
+      const host = window.location.hostname;
+      const subdomain = host.split(".")[0];
+      return subdomain;
+    };
+    const subdomain = getSubdomain();
+    (function() {
+      // Haal de huidige waarde uit storage
+      chrome.storage.local.get(['apiAssignmentFinishCallCount'], function(result) {
+        let apiAssignmentFinishCallCount = result.apiAssignmentFinishCallCount || 0;
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+          const url = args[0];
+          if (
+            typeof url === 'string' &&
+            url.startsWith(`https://${subdomain}.smartschool.be/planner/api/v1/planned-assignments/`) &&
+            url.endsWith('/resolve')
+          ) {
+            apiAssignmentFinishCallCount++;
+            chrome.storage.local.set({ apiAssignmentFinishCallCount }, () => {
+              console.log('API Call Count opgeslagen:', apiAssignmentFinishCallCount);
+            });
+          }
+          return originalFetch.apply(this, args);
+        };
+      });
+    })();
+  }
+}, 0);

@@ -66,6 +66,8 @@ Author: @superman2775
                 const buizen = result.buizenCount || 0;
             chrome.storage.local.get("hundredPercentCount", (result) => {
                 const hundredPercent = result.hundredPercentCount || 0;
+            chrome.storage.local.get("apiAssignmentFinishCallCount", (result) => {
+                const apiAssignmentFinishCallCount = result.apiAssignmentFinishCallCount || 0;
                 //How to make achievements:
                 /* {
                         title: "Some random title",
@@ -144,9 +146,34 @@ Author: @superman2775
                         progress: 100
                     },
                     {
-                        title: "💬 5 berichten verstuurd",
-                        desc: "Gebruik het berichtenplatform actief om te communiceren.",
-                        progress: 100
+                        title: "✅ One down!",
+                        desc: "Werk 1 taak af.",
+                        progress: Math.min((apiAssignmentFinishCallCount / 1) * 100, 100),
+                    },
+                    {
+                        title: "✅ Keep it going",
+                        desc: "Werk 10 taken af.",
+                        progress: Math.min((apiAssignmentFinishCallCount / 10) * 100, 100),
+                    },
+                    {
+                        title: "✅ They see me rollin'",
+                        desc: "Werk 50 taken af.",
+                        progress: Math.min((apiAssignmentFinishCallCount / 50) * 100, 100),
+                    },
+                    {
+                        title: "✅ Taskmaster",
+                        desc: "Werk 100 taken af.",
+                        progress: Math.min((apiAssignmentFinishCallCount / 100) * 100, 100),
+                    },
+                    {
+                        title: "✅ Multitasker",
+                        desc: "Werk 250 taken af.",
+                        progress: Math.min((apiAssignmentFinishCallCount / 250) * 100, 100),
+                    },
+                    {
+                        title: "✅ Task legend",
+                        desc: "Werk 500 taken af.",
+                        progress: Math.min((apiAssignmentFinishCallCount / 500) * 100, 100),
                     },
                     {
                         title: "🎯 20 lessen gevolgd",
@@ -276,8 +303,9 @@ Author: @superman2775
                 messagesBtn.parentNode.insertBefore(wrapper, messagesBtn);
                 wrapper.appendChild(button);
                 wrapper.appendChild(menuWrapper);
+                    });
                 });
-            }); // <-- Close chrome.storage.local.get callback here
+            });
         }
     }, 200);
 })();
