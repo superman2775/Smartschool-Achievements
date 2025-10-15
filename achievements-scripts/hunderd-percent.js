@@ -3,6 +3,7 @@ Don't use this file without permission
 Author: @superman2775
 */
 
+// This script works, so don't touch it
 setTimeout(function () {
   if (window.location.pathname.startsWith("/")) {
     const getSubdomain = () => {
