@@ -2,7 +2,7 @@ console.log('assignment-finish.js geladen');
 
 /* This file is part of Smartschool Achievements.
 Don't use this file without permission
-Author: @superman2775
+Author: @superman2775 + @broodje565
 */
 
 //Script doesn't work someone help meeeeeeee
