@@ -1,4 +1,3 @@
-
 {
   "manifest_version": 3,
   "name": "Smartschool Achievements",
@@ -7,14 +6,14 @@
   "content_scripts": [
     {
       "matches": ["*://*.smartschool.be/*"],
-      "exclude_matches": ["*://*.smartschool.be/login"], 
+      "exclude_matches": ["*://*.smartschool.be/login"],
       "js": [
+        "achievements-scripts/assignment-finish.js",
         "achievements-scripts/hunderd-percent.js",
         "achievements-scripts/buis.js",
-        "achievements-scripts/assignment-finish.js",
         "main-files/main.js"
       ],
-      "run_at": "document_end"
+      "run_at": "document_start"
     }
   ],
   "permissions": ["storage"],
