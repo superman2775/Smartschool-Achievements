@@ -4,7 +4,7 @@
   "version": "1.0",
   "description": "Voeg achievements toe aan Smartschool.",
   "background": {
-    "service_worker": "assignment-finish.js"
+    "service_worker": "achievements-scripts/assignment-finish.js"
   },
   "permissions": [
     "storage",
