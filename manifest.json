@@ -3,19 +3,27 @@
   "name": "Smartschool Achievements",
   "version": "1.0",
   "description": "Voeg achievements toe aan Smartschool.",
+  "background": {
+    "service_worker": "assignment-finish.js"
+  },
+  "permissions": [
+    "storage",
+    "webRequest",
+    "webRequestBlocking"
+  ],
+  "host_permissions": [
+    "https://*.smartschool.be/*"
+  ],
   "content_scripts": [
     {
       "matches": ["*://*.smartschool.be/*"],
       "exclude_matches": ["*://*.smartschool.be/login"],
       "js": [
-        "achievements-scripts/assignment-finish.js",
         "achievements-scripts/hunderd-percent.js",
         "achievements-scripts/buis.js",
         "main-files/main.js"
       ],
       "run_at": "document_start"
     }
-  ],
-  "permissions": ["storage"],
-  "host_permissions": ["https://*.smartschool.be/*"]
+  ]
 }
