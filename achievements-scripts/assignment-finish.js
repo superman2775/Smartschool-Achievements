@@ -4,6 +4,12 @@ console.log('assignment-finish.js geladen');
 Don't use this file without permission
 Author: @superman2775 + @broodje565
 */
+
+//this script works, so don't touch it
+//We count how many times the api call is made to /resolve when an assignment is finished
+//We store this in chrome storage so other scripts can read it
+
+// Listen for web requests to the /resolve endpoint
 chrome.webRequest.onCompleted.addListener(
   function(details) {
     if (
@@ -21,3 +27,4 @@ chrome.webRequest.onCompleted.addListener(
   },
   { urls: ["*://*.smartschool.be/*"] }
 );
+//that is basiclly it. easy right?
