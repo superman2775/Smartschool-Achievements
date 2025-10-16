@@ -20,6 +20,7 @@
       "js": [
         "achievements-scripts/hunderd-percent.js",
         "achievements-scripts/buis.js",
+        "achievements-scripts/modules.js",
         "main-files/main.js"
       ],
       "run_at": "document_start"
