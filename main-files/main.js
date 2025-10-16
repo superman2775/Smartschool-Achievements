@@ -224,7 +224,7 @@ Author: @superman2775 +@broodje565
                               secret: true
                             },
                             {
-                              title: "✍️ Oh no i have homework!",
+                              title: "✍️ Oh no I have homework!",
                               desc: "Bekijk de Planner.",
                               progress: visitPlanner * 100,
                               secret: true
