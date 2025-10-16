@@ -9,32 +9,31 @@ Author: @superman2775 + @broodje565
 (function () {
   'use strict';
 
-  // List of objects: { name, suffix }
-  // You can choose the name for each tracked item
+  console.log("[Achievements] Tracker gestart");
+
   const TRACKED_PAGES = [
     { name: 'visitNews', suffix: '/?module=News&file=index' },
     { name: 'visitMail', suffix: '/?module=Messages&file=index&function=main' },
     { name: 'visitMyDocs', suffix: '/mydoc' },
     { name: 'visitHandleiding', suffix: '/?module=Manual&file=manual&function=main' },
-    { name: 'visitOnlineSessions', suffix: '/online-session'},
-    { name: 'visitResults', suffix: '/results/main/results'},
-    { name: 'visitPlanner', suffix: '/planner'}
-    // Add more: { name: 'yourName', suffix: '/your/suffix' }
+    { name: 'visitOnlineSessions', suffix: '/online-session' },
+    { name: 'visitResults', suffix: '/results/main/results' },
+    { name: 'visitPlanner', suffix: '/planner' }
   ];
 
   const STORAGE_KEY = 'matchedPages';
 
+  // Controleert of huidige URL een van de suffixes bevat
   function checkPageAndStore() {
     const currentUrl = window.location.pathname + window.location.search + window.location.hash;
     TRACKED_PAGES.forEach(item => {
-      if (currentUrl.includes(item.suffix)) { // changed here
-        // Save value 1 in chrome storage under your chosen name, never above 1
+      if (currentUrl.includes(item.suffix)) {
         chrome.storage.local.get([STORAGE_KEY], (result) => {
           const pages = result[STORAGE_KEY] || {};
           if (pages[item.name] !== 1) {
             pages[item.name] = 1;
             chrome.storage.local.set({ [STORAGE_KEY]: pages }, () => {
-              console.debug('[modules] matched and set to 1:', item.name, currentUrl);
+              console.log(`[Achievements] ${item.name} ✅ (${currentUrl})`);
             });
           }
         });
@@ -42,7 +41,7 @@ Author: @superman2775 + @broodje565
     });
   }
 
-  // Detect navigation changes (SPA support)
+  // Hook navigatieveranderingen (SPA support)
   function hookNavigation() {
     const _push = history.pushState;
     const _replace = history.replaceState;
@@ -64,21 +63,22 @@ Author: @superman2775 + @broodje565
   function debounce(fn, wait) {
     let timer = null;
     return function (...args) {
-      if (timer) clearTimeout(timer);
+      clearTimeout(timer);
       timer = setTimeout(() => fn.apply(this, args), wait);
     };
   }
 
-  // Initial setup
+  // --- INIT ---
   hookNavigation();
   checkPageAndStore();
 
-  // Check on navigation and DOM changes
+  // Reageer op navigatie, DOM-wijzigingen en focus
   window.addEventListener('ss-location-change', debounce(checkPageAndStore, 150));
-  const mo = new MutationObserver(debounce(checkPageAndStore, 200));
+  const mo = new MutationObserver(debounce(checkPageAndStore, 300));
   mo.observe(document, { childList: true, subtree: true });
+  window.addEventListener('focus', debounce(checkPageAndStore, 200));
 
-  // Also check when tab regains focus
-  window.addEventListener('focus', debounce(checkPageAndStore, 150));
+  // Extra fallback (voor Smartschool’s dynamische hash-veranderingen)
+  setInterval(checkPageAndStore, 2000);
 
 })();
