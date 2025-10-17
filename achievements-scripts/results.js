@@ -3,8 +3,8 @@ Don't use this file without permission
 Author: @superman2775 + @broodje565
 */
 
-//this will get combined in one script with buis.js soon!
-// This script works, so don't touch it
+//this is the combined version of buis.js and hundred-percent.js
+//this script works, so don't touch it
 setTimeout(function () {
   if (window.location.pathname.startsWith("/")) {
     const getSubdomain = () => {
@@ -22,6 +22,10 @@ setTimeout(function () {
         return response.json();
       })
       .then((data) => {
+        const categories = {
+          buis: 0,
+          voldoende: 0,
+        };
         let hundredPercentCount = 0;
 
         // Probeer array te vinden
@@ -30,17 +34,33 @@ setTimeout(function () {
           : data.items || data.evaluations || [];
 
         evaluations.forEach((evaluation) => {
-          if (evaluation.graphic && typeof evaluation.graphic.value === "number") {
-            if (evaluation.graphic.value === 100) {
+          if (evaluation.graphic && evaluation.graphic.value !== undefined) {
+            const value = evaluation.graphic.value;
+
+            // Buis-telling
+            if (value < 50) {
+              categories.buis++;
+            } else {
+              categories.voldoende++;
+            }
+
+            // 100%-telling
+            if (value === 100) {
               hundredPercentCount++;
             }
           }
         });
 
         // Sla op in storage zodat andere scripts het kunnen lezen
-        chrome.storage.local.set({ hundredPercentCount }, () => {
-          console.log("[Achievements] hundredPercentCount opgeslagen in storage");
-        });
+        chrome.storage.local.set(
+          {
+            buizenCount: categories.buis,
+            hundredPercentCount: hundredPercentCount,
+          },
+          () => {
+            console.log("[Achievements] buizenCount en hundredPercentCount opgeslagen in storage");
+          }
+        );
       })
       .catch((error) => console.error("Error fetching:", error));
   }
