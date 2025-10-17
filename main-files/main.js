@@ -218,7 +218,7 @@ Author: @superman2775 +@broodje565
                               secret: true
                             },
                             {
-                              title: "📝 FAILURE", // For those who don't know: it is a reference to Steven Hu
+                              title: "📝 FAILURE", // For those who don't know: it is a reference to Steven He
                               desc: "Bekijk Resultaten.",
                               progress: visitResults * 100,
                               secret: true
@@ -227,6 +227,12 @@ Author: @superman2775 +@broodje565
                               title: "✍️ Oh no I have homework!",
                               desc: "Bekijk de Planner.",
                               progress: visitPlanner * 100,
+                              secret: true
+                            },
+                            {
+                              title: "Room temperature IQ", //Steven He reference again
+                              desc: "Krijg 250 buizen",
+                              progress: Math.min((buizen / 250) * 100, 100),
                               secret: true
                             },
                             {

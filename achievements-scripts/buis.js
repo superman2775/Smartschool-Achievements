@@ -2,7 +2,7 @@
 Don't use this file without permission
 Author: @superman2775 + @broodje565
 */
-
+//this will get combined in one script with hunderd-percent.js soon!
 // This script works, so don't touch it
 setTimeout(function () {
   if (window.location.pathname.startsWith("/")) {

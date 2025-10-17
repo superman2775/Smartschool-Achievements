@@ -3,6 +3,9 @@ Don't use this file without permission
 Author: @superman2775 + @broodje565
 */
 
+//this script works, so don't touch it
+//We track if the user has visited certain pages, and store that in chrome storage
+//Other scripts can read this to unlock achievements
 (function () {
   'use strict';
 
