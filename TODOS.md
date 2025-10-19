@@ -1,3 +1,5 @@
 - Streaks
 - Leaderboards
 - Make notifications when you reach achievement
+- Make a total xp
+- Make codes for extra XP + to reward people who helped us

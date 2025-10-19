@@ -3,15 +3,14 @@ Don't use this file without permission
 Author: @superman2775 + @broodje565
 */
 
-// To prevent this script from running, i made it a comment
-// If u wanna make this, join our discord to become a dev: https://discord.gg/5qFHBHREdH
-// Whopper
+//To prevent this script from running, i made it a comment
+//If u wanna make this, join our discord to become a dev: https://discord.gg/5qFHBHREdH
+//Whopper
 
 
 /*
-// Voorbeeld: zet een fake notification in sessionStorage voor jouw sessie.
-// Vervang "(JOUW_SESSION_KEY)" door de juiste key die je ziet in sessionStorage.
-const key = "(JOUW_SESSION_KEY)"; // bv: "notif_queue_12345" — kopieer uit sessionStorage
+// Make a fake notification to show the user they unlocked an achievement
+const key = "(JOUW_SESSION_KEY)"; //we need this to go automaticly...
 const fakeNotif = [{
   ssid: 2237,
   userid: 8772,
@@ -21,8 +20,8 @@ const fakeNotif = [{
   metadata: JSON.stringify({
     icon: "results",
     iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement.png?raw=true", //our logo
-    title: "Testmelding (lokale demo)",
-    description: "Dit is alleen zichtbaar in jouw browser, niet voor anderen.",
+    title: "Finished new achievement!",
+    description: "You finished the (achievement name) achievement!",
     date: new Date().toLocaleString(),
     url: "/",
     urlTarget: "_self"
