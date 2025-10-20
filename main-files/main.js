@@ -319,13 +319,24 @@ Author: @superman2775 +@broodje565
         xpDisplay.textContent = `🌟 Totaal XP: ${totalXP}`;
 
         // === Level systeem ===
-        const xpPerLevel = 100;
-        const level = Math.floor(totalXP / xpPerLevel);
-        const currentXP = totalXP % xpPerLevel;
-        const progressPercent = (currentXP / xpPerLevel) * 100;
+        // Basis XP voor level 1
+        const baseXP = 100; 
+        let level = 0;
+        let xpLeft = totalXP;
+        let xpNeededForNextLevel = baseXP + (level * 100);
 
-        levelDisplay.textContent = `🧠 Level ${level} (${currentXP} / ${xpPerLevel} XP naar level ${level + 1})`;
+        // Tel levels zolang er genoeg XP is
+        while (xpLeft >= xpNeededForNextLevel) {
+            xpLeft -= xpNeededForNextLevel;
+            level++;
+            xpNeededForNextLevel = baseXP + (level * 100);
+        }
+
+        // Percentage voor progress bar
+        const progressPercent = (xpLeft / xpNeededForNextLevel) * 100;
+        levelDisplay.textContent = `🧠 Level ${level} (${xpLeft} / ${xpNeededForNextLevel} XP naar level ${level + 1})`;
         levelBar.style.width = `${progressPercent}%`;
+
 
         achievements.forEach(a => {
           const item = document.createElement('div');
