@@ -37,6 +37,10 @@
         - Download Smartschool Message
     - 200 xp
         - Download Smartschool Achievements
+    - Hacks Hacks Hacks
+        - Download Smartschool Tweaks
+    - Games???
+        - Download SmartGame
 
 - Smartschool OAuth
     - Connected
