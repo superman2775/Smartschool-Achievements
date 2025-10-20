@@ -89,6 +89,14 @@ Author: @superman2775 +@broodje565
       scrollContainer.style.maxHeight = '400px';
       scrollContainer.style.paddingRight = '4px';
 
+      // Scheidingslijn tussen XP en achievements
+      const separator = document.createElement('hr');
+      separator.style.border = 'none';
+      separator.style.height = '1px';
+      separator.style.background = '#ddd';
+      separator.style.margin = '8px 10px';
+      menu.appendChild(separator);
+
       // Data ophalen
       chrome.storage.local.get(["buizenCount","hundredPercentCount","apiAssignmentFinishCallCount","visitNews","visitMail","visitMyDocs","visitHandleiding","visitOnlineSessions","visitResults","visitPlanner"], (res) => {
 
