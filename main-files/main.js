@@ -319,7 +319,7 @@ Author: @superman2775 +@broodje565
         xpDisplay.textContent = `🌟 Totaal XP: ${totalXP}`;
 
         // === Level systeem ===
-        const xpPerLevel = 1000;
+        const xpPerLevel = 100;
         const level = Math.floor(totalXP / xpPerLevel);
         const currentXP = totalXP % xpPerLevel;
         const progressPercent = (currentXP / xpPerLevel) * 100;
