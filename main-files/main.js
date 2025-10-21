@@ -109,7 +109,7 @@ Author: @superman2775 +@broodje565
         const visitResults = res.visitResults || 0;
         const visitPlanner = res.visitPlanner || 0;
 
-        // === ACHIEVEMENTS (zoals bij jou) ===
+        // === ACHIEVEMENTS ===
         const achievements = [
            {
               title: "😩 One of many",
