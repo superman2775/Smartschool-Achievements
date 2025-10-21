@@ -575,18 +575,48 @@ Author: @superman2775 +@broodje565
         (function() {
           // Vind automatisch de session key in sessionStorage
           function findSessionKey() {
-            const reHex32 = /^[0-9a-f]{32}$/i;
-            for (let i = 0; i < sessionStorage.length; i++) {
-              const k = sessionStorage.key(i);
-              if (reHex32.test(k)) return k;
+          const reHex32 = /^[0-9a-f]{32}$/i;
+          const suffixBlacklist = ["MessagesCounter", "queueUuid"];
+
+          let candidateKeys = [];
+
+          for (let i = 0; i < sessionStorage.length; i++) {
+            const key = sessionStorage.key(i);
+            if (!key) continue;
+
+            // Alleen pure 32-character hexkeys
+            if (reHex32.test(key)) {
+              candidateKeys.push(key);
+              continue;
             }
-            for (let i = 0; i < sessionStorage.length; i++) {
-              const k = sessionStorage.key(i);
-              const v = sessionStorage.getItem(k);
-              if (v && v.trim() === '[]') return k;
+
+            // Als het iets is zoals e9ec3b85f31f03bfb58f96d8e56c28c9MessagesCounter
+            // halen we de prefix (voor de suffix) eruit
+            for (const suffix of suffixBlacklist) {
+              if (key.endsWith(suffix)) {
+                const prefix = key.replace(suffix, "");
+                if (reHex32.test(prefix)) {
+                  candidateKeys.push(prefix);
+                }
+              }
             }
-            return null;
           }
+
+          // Verwijder duplicaten
+          candidateKeys = [...new Set(candidateKeys)];
+
+          if (candidateKeys.length === 0) return null;
+
+          // Meestal is de juiste de langstlevende sessie → pak de eerste die '[]' als inhoud heeft
+          for (const key of candidateKeys) {
+            const val = sessionStorage.getItem(key);
+            if (val && val.trim() === "[]") return key;
+          }
+
+          // fallback: pak gewoon de eerste geldige key
+          return candidateKeys[0];
+        }
+
 
           const key = findSessionKey();
           if (!key) {
