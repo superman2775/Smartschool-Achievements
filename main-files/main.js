@@ -408,7 +408,7 @@ Author: @superman2775 +@broodje565
           scrollContainer.appendChild(item);
         });
 
-        // === 💥 TOEVOEGING: Code inwisselen ===
+        // === Code inwisselen ===
         const redeemContainer = document.createElement('div');
         redeemContainer.className = 'achievement-item topnav__menuitem';
         redeemContainer.style.display = 'flex';
@@ -471,9 +471,8 @@ Author: @superman2775 +@broodje565
 
         const validCodes = {
           "WHOPPER": 100,
-          "TEAMSMARTSCHOOLACHIEVEMENTSISGREAT": 1000,
-          "HAPPYNEWYEAR2026": 500,
-          "ILOVECOOKIES": 50
+          "TEAMSMARTSCHOOLACHIEVEMENTS1000": 1000,
+          "HAPPYNEWYEAR2026": 500
         };
 
         let redeemed = res.redeemedCodes || [];
