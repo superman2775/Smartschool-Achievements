@@ -311,11 +311,11 @@ Author: @superman2775 +@broodje565
           }
         });
 
-        // === Bereken totaal XP ===
+        // Bereken totaal XP
         const totalXP = achievements.reduce((sum, a) => sum + ((a.progress >= 100) ? (a.xp || 0) : 0), 0);
         xpDisplay.textContent = `🌟 Totaal XP: ${totalXP}`;
 
-        // === Level systeem ===
+        // Level systeem
         // Basis XP voor level 1
         const baseXP = 100; 
         let level = 0;
@@ -437,4 +437,111 @@ Author: @superman2775 +@broodje565
       });
     }
   }, 200);
+      // === Code inwisselen voor XP ===
+    const redeemContainer = document.createElement('div');
+    redeemContainer.className = 'achievement-item topnav__menuitem';
+    redeemContainer.style.display = 'flex';
+    redeemContainer.style.flexDirection = 'column';
+    redeemContainer.style.alignItems = 'flex-start';
+    redeemContainer.style.width = '100%';
+    redeemContainer.style.padding = '10px 14px';
+    redeemContainer.style.boxSizing = 'border-box';
+    redeemContainer.style.borderTop = '1px solid rgba(0,0,0,0.1)';
+    redeemContainer.style.background = '#fafafa';
+
+    const redeemTitle = document.createElement('span');
+    redeemTitle.textContent = '🎁 Code inwisselen';
+    redeemTitle.style.fontWeight = '600';
+    redeemTitle.style.marginBottom = '6px';
+    redeemContainer.appendChild(redeemTitle);
+
+    const redeemDesc = document.createElement('span');
+    redeemDesc.textContent = 'Voer een code in om XP te verdienen.';
+    redeemDesc.style.fontSize = '0.85rem';
+    redeemDesc.style.color = '#666';
+    redeemDesc.style.marginBottom = '8px';
+    redeemContainer.appendChild(redeemDesc);
+
+    const inputRow = document.createElement('div');
+    inputRow.style.display = 'flex';
+    inputRow.style.width = '100%';
+    inputRow.style.gap = '6px';
+
+    const codeInput = document.createElement('input');
+    codeInput.type = 'text';
+    codeInput.placeholder = 'Voer code in...';
+    codeInput.style.flex = '1';
+    codeInput.style.padding = '6px 8px';
+    codeInput.style.border = '1px solid #ccc';
+    codeInput.style.borderRadius = '4px';
+    codeInput.style.fontSize = '0.85rem';
+
+    const redeemBtn = document.createElement('button');
+    redeemBtn.textContent = 'Inwisselen';
+    redeemBtn.style.background = '#43a047';
+    redeemBtn.style.color = '#fff';
+    redeemBtn.style.border = 'none';
+    redeemBtn.style.borderRadius = '4px';
+    redeemBtn.style.padding = '6px 10px';
+    redeemBtn.style.cursor = 'pointer';
+    redeemBtn.style.fontWeight = '600';
+
+    inputRow.appendChild(codeInput);
+    inputRow.appendChild(redeemBtn);
+    redeemContainer.appendChild(inputRow);
+
+    const redeemStatus = document.createElement('span');
+    redeemStatus.style.fontSize = '0.8rem';
+    redeemStatus.style.color = '#555';
+    redeemStatus.style.marginTop = '6px';
+    redeemContainer.appendChild(redeemStatus);
+
+    scrollContainer.appendChild(redeemContainer);
+
+    // === Code verificatie + opslag ===
+    const validCodes = {
+      "WHOPPER": 100,
+      "TeamSmartSchoolAchievementsIsGreat": 1000,
+      "HAPPYNEWYEAR2026": 500,
+      "ILoveCookies": 50
+    };
+
+    chrome.storage.local.get(["redeemedCodes", "bonusXP"], (res2) => {
+      const redeemed = res2.redeemedCodes || [];
+      let bonusXP = res2.bonusXP || 0;
+
+      redeemBtn.addEventListener('click', () => {
+        const code = codeInput.value.trim().toUpperCase();
+        if (!code) {
+          redeemStatus.textContent = "⚠️ Vul eerst een code in.";
+          redeemStatus.style.color = "#f57c00";
+          return;
+        }
+
+        if (redeemed.includes(code)) {
+          redeemStatus.textContent = "❌ Code al gebruikt.";
+          redeemStatus.style.color = "#e53935";
+          return;
+        }
+
+        if (validCodes[code]) {
+          const gainedXP = validCodes[code];
+          bonusXP += gainedXP;
+          redeemed.push(code);
+
+          chrome.storage.local.set({ redeemedCodes: redeemed, bonusXP: bonusXP }, () => {
+            redeemStatus.textContent = `✅ ${gainedXP} XP toegevoegd!`;
+            redeemStatus.style.color = "#43a047";
+            codeInput.value = '';
+
+            // Herlaad menu (zodat XP direct wordt geüpdatet)
+            setTimeout(() => location.reload(), 800);
+          });
+        } else {
+          redeemStatus.textContent = "❌ Ongeldige code.";
+          redeemStatus.style.color = "#e53935";
+        }
+      });
+    });
+
 })();
