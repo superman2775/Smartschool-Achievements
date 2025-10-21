@@ -472,7 +472,9 @@ Author: @superman2775 +@broodje565
         const validCodes = {
           "WHOPPER": 100,
           "TEAMSMARTSCHOOLACHIEVEMENTS1000": 1000,
-          "HAPPYNEWYEAR2026": 500
+          "HAPPYNEWYEAR2026": 500,
+          "SUMMERVIBES2026": 250
+          "LUCKYUSER": 1000
         };
 
         let redeemed = res.redeemedCodes || [];
