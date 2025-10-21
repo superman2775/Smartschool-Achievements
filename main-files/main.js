@@ -289,22 +289,11 @@ Author: @superman2775 +@broodje565
               xp: 10
             },
             {
-              title: "Room temperature IQ", //Steven He reference again
+              title: "🌡️ Room temperature IQ", //Steven He reference again
               desc: "Krijg 250 buizen",
               progress: Math.min((buizen / 250) * 100, 100),
               secret: true,
               xp: 200
-            },
-            {
-              title: "🧠 50 quizzen voltooid",
-              desc: "Behaal een score in vijftig verschillende quizzen.",
-              progress: 0
-            },
-            {
-              title: "🚀 Actief in 5 vakken",
-              desc: "Werk in minstens vijf verschillende vakken.",
-              progress: 60,
-              secret: true
             },
             {
               title: "🏆 De ultieme student",
