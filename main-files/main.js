@@ -96,7 +96,7 @@ Author: @superman2775 +@broodje565
       menu.appendChild(separator);
 
       // === DATA OPHALEN ===
-      chrome.storage.local.get(["buizenCount", "hundredPercentCount", "apiAssignmentFinishCallCount", "visitNews", "visitMail", "visitMyDocs", "visitHandleiding", "visitOnlineSessions", "visitResults", "visitPlanner", "redeemedCodes", "bonusXP"], (res) => {
+      chrome.storage.local.get(["buizenCount", "hundredPercentCount", "apiAssignmentFinishCallCount", "visitNews", "visitMail", "visitMyDocs", "visitHandleiding", "visitOnlineSessions", "visitResults", "visitPlanner", "visitWopiCount", "redeemedCodes", "bonusXP"], (res) => {
 
         const buizen = res.buizenCount || 0;
         const hundredPercent = res.hundredPercentCount || 0;
@@ -108,6 +108,7 @@ Author: @superman2775 +@broodje565
         const visitOnlineSessions = res.visitOnlineSessions || 0;
         const visitResults = res.visitResults || 0;
         const visitPlanner = res.visitPlanner || 0;
+        const visitWopiCount = res.visitWopiCount || 0;
 
         // === ACHIEVEMENTS ===
         const achievements = [
@@ -235,6 +236,42 @@ Author: @superman2775 +@broodje565
               title: "✅ Task god",
               desc: "Werk 1000 taken af.",
               progress: Math.min((apiAssignmentFinishCallCount / 1000) * 100, 100),
+              xp: 150
+            },
+            {
+              title: "🗂️ File explorer",
+              desc: "Open 1 bestand.",
+              progress: Math.min((visitWopiCount / 1) * 100, 100),
+              xp: 10
+            },
+            {
+              title: "🗂️ File user",
+              desc: "Open 10 bestanden.",
+              progress: Math.min((visitWopiCount / 10) * 100, 100),
+              xp: 25
+            },
+            {
+              title: "🗂️ File ninja",
+              desc: "Open 25 bestanden.",
+              progress: Math.min((visitWopiCount / 25) * 100, 100),
+              xp: 50
+            },
+            {
+              title: "🗂️ File master",
+              desc: "Open 50 bestanden.",
+              progress: Math.min((visitWopiCount / 50) * 100, 100),
+              xp: 75
+            },
+            {
+              title: "🗂️ File monster",
+              desc: "Open 100 bestanden.",
+              progress: Math.min((visitWopiCount / 100) * 100, 100),
+              xp: 100
+            },
+            {
+              title: "🗂️ Final file",
+              desc: "Open 250 bestanden.",
+              progress: Math.min((visitWopiCount / 250) * 100, 100),
               xp: 150
             },
             {

@@ -18,6 +18,7 @@
       "matches": ["*://*.smartschool.be/*"],
       "exclude_matches": ["*://*.smartschool.be/login"],
       "js": [
+        "achievements-scripts/documents.js",
         "achievements-scripts/results.js",
         "achievements-scripts/modules.js",
         "main-files/main.js"
