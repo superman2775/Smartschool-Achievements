@@ -1,5 +1,3 @@
-- Streaks
-- Leaderboards
-- Make notifications when you reach achievement
-- Make a total xp
-- Make codes for extra XP + to reward people who helped us
+- Streaks (idk if i should make this)
+- Leaderboards (lots of people can cheat)
+- Make notifications when you reach achievement (imma make this now)

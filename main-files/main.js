@@ -473,8 +473,9 @@ Author: @superman2775 +@broodje565
           "WHOPPER": 100,
           "TEAMSMARTSCHOOLACHIEVEMENTS1000": 1000,
           "HAPPYNEWYEAR2026": 500,
-          "SUMMERVIBES2026": 250
-          "LUCKYUSER": 1000
+          "SUMMERVIBES2026": 250,
+          "BACK2SCHOOL2026": 250,
+          "LUCKYUSER10000": 1000
         };
 
         let redeemed = res.redeemedCodes || [];
@@ -532,6 +533,104 @@ Author: @superman2775 +@broodje565
         messagesBtn.parentNode.insertBefore(wrapper, messagesBtn);
         wrapper.appendChild(button);
         wrapper.appendChild(menuWrapper);
+
+        // === AUTOMATISCHE MELDINGEN BIJ NIEUWE ACHIEVEMENTS / LEVEL-UP ===
+        (function() {
+          // Vind automatisch de session key in sessionStorage
+          function findSessionKey() {
+            const reHex32 = /^[0-9a-f]{32}$/i;
+            for (let i = 0; i < sessionStorage.length; i++) {
+              const k = sessionStorage.key(i);
+              if (reHex32.test(k)) return k;
+            }
+            for (let i = 0; i < sessionStorage.length; i++) {
+              const k = sessionStorage.key(i);
+              const v = sessionStorage.getItem(k);
+              if (v && v.trim() === '[]') return k;
+            }
+            return null;
+          }
+
+          const key = findSessionKey();
+          if (!key) {
+            console.warn("[Achievements] Geen session key gevonden voor meldingen.");
+            return;
+          }
+
+          // Lees vorige status uit storage om te weten welke achievements nieuw zijn
+          chrome.storage.local.get(["seenAchievements", "lastLevel"], (old) => {
+            const seen = old.seenAchievements || [];
+            const lastLevel = old.lastLevel || 0;
+
+            // Controleer op nieuwe achievements
+            const newlyCompleted = achievements.filter(a => a.progress >= 100 && !seen.includes(a.title));
+
+            // Meldingen aanmaken
+            const now = new Date().toISOString();
+            const notifications = [];
+
+            newlyCompleted.forEach(a => {
+              notifications.push({
+                ssid: 2237,
+                userid: 8772,
+                userlt: 0,
+                created: now,
+                hash: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
+                metadata: JSON.stringify({
+                  icon: "results",
+                  iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement.png?raw=true",
+                  title: `🏆 Nieuw achievement behaald!`,
+                  description: `${a.title} – ${a.desc} (+${a.xp} XP)`,
+                  date: new Date().toLocaleString(),
+                  url: "/",
+                  urlTarget: "_self"
+                }),
+                unread: true
+              });
+              seen.push(a.title);
+            });
+
+            // Check voor level-up
+            if (level > lastLevel) {
+              notifications.push({
+                ssid: 2237,
+                userid: 8772,
+                userlt: 0,
+                created: now,
+                hash: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
+                metadata: JSON.stringify({
+                  icon: "results",
+                  iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement.png?raw=true",
+                  title: `🧠 Level Up!`,
+                  description: `Je hebt level ${level} bereikt!`,
+                  date: new Date().toLocaleString(),
+                  url: "/",
+                  urlTarget: "_self"
+                }),
+                unread: true
+              });
+            }
+
+            // Niets te melden → stop
+            if (notifications.length === 0) return;
+
+            // Zet alle meldingen in sessionStorage
+            try {
+              const existing = JSON.parse(sessionStorage.getItem(key) || "[]");
+              const merged = existing.concat(notifications);
+              sessionStorage.setItem(key, JSON.stringify(merged));
+              console.log(`[Achievements] ${notifications.length} melding(en) toegevoegd onder key ${key}`);
+              // herlaad zodat Smartschool de nieuwe meldingen toont
+              location.reload();
+            } catch (err) {
+              console.error("[Achievements] Fout bij opslaan notificaties:", err);
+            }
+
+            // Sla nieuwe status op
+            chrome.storage.local.set({ seenAchievements: seen, lastLevel: level });
+          });
+        })();
+
       });
     }
   }, 200);
