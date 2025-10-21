@@ -40,14 +40,13 @@ Author: @superman2775 +@broodje565
       menu.style.display = 'flex';
       menu.style.flexDirection = 'column';
 
-      // Titel
       const header = document.createElement('div');
       header.className = 'topnav__menu__hdr';
       header.innerHTML = `<h2 class="topnav__menu__title" style="margin-left:10px;">Achievements</h2>`;
       header.style.flex = '0 0 auto';
       menu.appendChild(header);
 
-      // === Nieuw: XP en Level Info ===
+      // === XP + Level sectie ===
       const xpContainer = document.createElement('div');
       xpContainer.style.margin = '0 10px 10px 10px';
       xpContainer.style.display = 'flex';
@@ -62,7 +61,7 @@ Author: @superman2775 +@broodje565
       const levelDisplay = document.createElement('div');
       levelDisplay.style.fontWeight = '600';
       levelDisplay.style.color = '#29b6f6';
-      levelDisplay.textContent = '🧠 Level 0 (0 / 1000 XP)';
+      levelDisplay.textContent = '🧠 Level 0 (0 / 100 XP)';
 
       const levelBarContainer = document.createElement('div');
       levelBarContainer.style.width = '100%';
@@ -89,7 +88,6 @@ Author: @superman2775 +@broodje565
       scrollContainer.style.maxHeight = '400px';
       scrollContainer.style.paddingRight = '4px';
 
-      // Scheidingslijn tussen XP en achievements
       const separator = document.createElement('hr');
       separator.style.border = 'none';
       separator.style.height = '1px';
@@ -97,8 +95,8 @@ Author: @superman2775 +@broodje565
       separator.style.margin = '8px 10px';
       menu.appendChild(separator);
 
-      // Data ophalen
-      chrome.storage.local.get(["buizenCount","hundredPercentCount","apiAssignmentFinishCallCount","visitNews","visitMail","visitMyDocs","visitHandleiding","visitOnlineSessions","visitResults","visitPlanner"], (res) => {
+      // === DATA OPHALEN ===
+      chrome.storage.local.get(["buizenCount", "hundredPercentCount", "apiAssignmentFinishCallCount", "visitNews", "visitMail", "visitMyDocs", "visitHandleiding", "visitOnlineSessions", "visitResults", "visitPlanner", "redeemedCodes", "bonusXP"], (res) => {
 
         const buizen = res.buizenCount || 0;
         const hundredPercent = res.hundredPercentCount || 0;
@@ -111,9 +109,9 @@ Author: @superman2775 +@broodje565
         const visitResults = res.visitResults || 0;
         const visitPlanner = res.visitPlanner || 0;
 
-        // === Achievements array ===
+        // === ACHIEVEMENTS (zoals bij jou) ===
         const achievements = [
-            {
+           {
               title: "😩 One of many",
               desc: "Buis op 1 toets.",
               progress: Math.min((buizen / 1) * 100, 100),
@@ -301,7 +299,7 @@ Author: @superman2775 +@broodje565
               progress: 0,
               secret: true
             }
-        ];
+           ];
 
         // Geheimen verbergen
         achievements.forEach(a => {
@@ -311,30 +309,28 @@ Author: @superman2775 +@broodje565
           }
         });
 
-        // Bereken totaal XP
-        const totalXP = achievements.reduce((sum, a) => sum + ((a.progress >= 100) ? (a.xp || 0) : 0), 0);
+        // === TOTAAL XP (inclusief bonusXP van codes) ===
+        const bonusXP = res.bonusXP || 0;
+        const totalXP = achievements.reduce((sum, a) => sum + ((a.progress >= 100) ? (a.xp || 0) : 0), 0) + bonusXP;
         xpDisplay.textContent = `🌟 Totaal XP: ${totalXP}`;
 
-        // Level systeem
-        // Basis XP voor level 1
-        const baseXP = 100; 
+        // === LEVEL berekenen ===
+        const baseXP = 100;
         let level = 0;
         let xpLeft = totalXP;
         let xpNeededForNextLevel = baseXP + (level * 100);
 
-        // Tel levels zolang er genoeg XP is
         while (xpLeft >= xpNeededForNextLevel) {
-            xpLeft -= xpNeededForNextLevel;
-            level++;
-            xpNeededForNextLevel = baseXP + (level * 100);
+          xpLeft -= xpNeededForNextLevel;
+          level++;
+          xpNeededForNextLevel = baseXP + (level * 100);
         }
 
-        // Percentage voor progress bar
         const progressPercent = (xpLeft / xpNeededForNextLevel) * 100;
         levelDisplay.textContent = `🧠 Level ${level} (${xpLeft} / ${xpNeededForNextLevel} XP naar level ${level + 1})`;
         levelBar.style.width = `${progressPercent}%`;
 
-
+        // === ACHIEVEMENTS MAKEN ===
         achievements.forEach(a => {
           const item = document.createElement('div');
           item.className = 'achievement-item topnav__menuitem';
@@ -400,19 +396,120 @@ Author: @superman2775 +@broodje565
           const bar = document.createElement('div');
           bar.style.height = '100%';
           bar.style.width = `${a.progress}%`;
-          bar.style.background =
-            a.progress >= 100
-              ? 'linear-gradient(90deg, #2e7d32, #43a047)'
-              : a.progress <= 0
+          bar.style.background = a.progress >= 100
+            ? 'linear-gradient(90deg, #2e7d32, #43a047)'
+            : a.progress <= 0
               ? '#bdbdbd'
               : 'linear-gradient(90deg, #f57c00, #ffa726)';
           bar.style.transition = 'width 0.3s ease';
 
           barContainer.appendChild(bar);
           item.appendChild(barContainer);
-
           scrollContainer.appendChild(item);
         });
+
+        // === 💥 TOEVOEGING: Code inwisselen ===
+        const redeemContainer = document.createElement('div');
+        redeemContainer.className = 'achievement-item topnav__menuitem';
+        redeemContainer.style.display = 'flex';
+        redeemContainer.style.flexDirection = 'column';
+        redeemContainer.style.alignItems = 'flex-start';
+        redeemContainer.style.width = '100%';
+        redeemContainer.style.padding = '10px 14px';
+        redeemContainer.style.boxSizing = 'border-box';
+        redeemContainer.style.borderTop = '1px solid rgba(0,0,0,0.1)';
+        redeemContainer.style.background = '#fafafa';
+
+        const redeemTitle = document.createElement('span');
+        redeemTitle.textContent = '🎁 Code inwisselen';
+        redeemTitle.style.fontWeight = '600';
+        redeemTitle.style.marginBottom = '6px';
+        redeemContainer.appendChild(redeemTitle);
+
+        const redeemDesc = document.createElement('span');
+        redeemDesc.textContent = 'Voer een code in om XP te verdienen.';
+        redeemDesc.style.fontSize = '0.85rem';
+        redeemDesc.style.color = '#666';
+        redeemDesc.style.marginBottom = '8px';
+        redeemContainer.appendChild(redeemDesc);
+
+        const inputRow = document.createElement('div');
+        inputRow.style.display = 'flex';
+        inputRow.style.width = '100%';
+        inputRow.style.gap = '6px';
+
+        const codeInput = document.createElement('input');
+        codeInput.type = 'text';
+        codeInput.placeholder = 'Voer code in...';
+        codeInput.style.flex = '1';
+        codeInput.style.padding = '6px 8px';
+        codeInput.style.border = '1px solid #ccc';
+        codeInput.style.borderRadius = '4px';
+        codeInput.style.fontSize = '0.85rem';
+
+        const redeemBtn = document.createElement('button');
+        redeemBtn.textContent = 'Inwisselen';
+        redeemBtn.style.background = '#43a047';
+        redeemBtn.style.color = '#fff';
+        redeemBtn.style.border = 'none';
+        redeemBtn.style.borderRadius = '4px';
+        redeemBtn.style.padding = '6px 10px';
+        redeemBtn.style.cursor = 'pointer';
+        redeemBtn.style.fontWeight = '600';
+
+        inputRow.appendChild(codeInput);
+        inputRow.appendChild(redeemBtn);
+        redeemContainer.appendChild(inputRow);
+
+        const redeemStatus = document.createElement('span');
+        redeemStatus.style.fontSize = '0.8rem';
+        redeemStatus.style.color = '#555';
+        redeemStatus.style.marginTop = '6px';
+        redeemContainer.appendChild(redeemStatus);
+
+        scrollContainer.appendChild(redeemContainer);
+
+        const validCodes = {
+          "WHOPPER": 100,
+          "TEAMSMARTSCHOOLACHIEVEMENTSISGREAT": 1000,
+          "HAPPYNEWYEAR2026": 500,
+          "ILOVECOOKIES": 50
+        };
+
+        let redeemed = res.redeemedCodes || [];
+        let currentBonusXP = bonusXP;
+
+        redeemBtn.addEventListener('click', () => {
+          const code = codeInput.value.trim().toUpperCase();
+          if (!code) {
+            redeemStatus.textContent = "⚠️ Vul eerst een code in.";
+            redeemStatus.style.color = "#f57c00";
+            return;
+          }
+
+          if (redeemed.includes(code)) {
+            redeemStatus.textContent = "❌ Code al gebruikt.";
+            redeemStatus.style.color = "#e53935";
+            return;
+          }
+
+          if (validCodes[code]) {
+            const gainedXP = validCodes[code];
+            currentBonusXP += gainedXP;
+            redeemed.push(code);
+
+            chrome.storage.local.set({ redeemedCodes: redeemed, bonusXP: currentBonusXP }, () => {
+              redeemStatus.textContent = `✅ ${gainedXP} XP toegevoegd!`;
+              redeemStatus.style.color = "#43a047";
+              codeInput.value = '';
+              setTimeout(() => location.reload(), 800);
+            });
+          } else {
+            redeemStatus.textContent = "❌ Ongeldige code.";
+            redeemStatus.style.color = "#e53935";
+          }
+        });
+        // === EINDE TOEVOEGING ===
 
         menu.appendChild(scrollContainer);
         menuWrapper.appendChild(menu);
@@ -437,111 +534,4 @@ Author: @superman2775 +@broodje565
       });
     }
   }, 200);
-      // === Code inwisselen voor XP ===
-    const redeemContainer = document.createElement('div');
-    redeemContainer.className = 'achievement-item topnav__menuitem';
-    redeemContainer.style.display = 'flex';
-    redeemContainer.style.flexDirection = 'column';
-    redeemContainer.style.alignItems = 'flex-start';
-    redeemContainer.style.width = '100%';
-    redeemContainer.style.padding = '10px 14px';
-    redeemContainer.style.boxSizing = 'border-box';
-    redeemContainer.style.borderTop = '1px solid rgba(0,0,0,0.1)';
-    redeemContainer.style.background = '#fafafa';
-
-    const redeemTitle = document.createElement('span');
-    redeemTitle.textContent = '🎁 Code inwisselen';
-    redeemTitle.style.fontWeight = '600';
-    redeemTitle.style.marginBottom = '6px';
-    redeemContainer.appendChild(redeemTitle);
-
-    const redeemDesc = document.createElement('span');
-    redeemDesc.textContent = 'Voer een code in om XP te verdienen.';
-    redeemDesc.style.fontSize = '0.85rem';
-    redeemDesc.style.color = '#666';
-    redeemDesc.style.marginBottom = '8px';
-    redeemContainer.appendChild(redeemDesc);
-
-    const inputRow = document.createElement('div');
-    inputRow.style.display = 'flex';
-    inputRow.style.width = '100%';
-    inputRow.style.gap = '6px';
-
-    const codeInput = document.createElement('input');
-    codeInput.type = 'text';
-    codeInput.placeholder = 'Voer code in...';
-    codeInput.style.flex = '1';
-    codeInput.style.padding = '6px 8px';
-    codeInput.style.border = '1px solid #ccc';
-    codeInput.style.borderRadius = '4px';
-    codeInput.style.fontSize = '0.85rem';
-
-    const redeemBtn = document.createElement('button');
-    redeemBtn.textContent = 'Inwisselen';
-    redeemBtn.style.background = '#43a047';
-    redeemBtn.style.color = '#fff';
-    redeemBtn.style.border = 'none';
-    redeemBtn.style.borderRadius = '4px';
-    redeemBtn.style.padding = '6px 10px';
-    redeemBtn.style.cursor = 'pointer';
-    redeemBtn.style.fontWeight = '600';
-
-    inputRow.appendChild(codeInput);
-    inputRow.appendChild(redeemBtn);
-    redeemContainer.appendChild(inputRow);
-
-    const redeemStatus = document.createElement('span');
-    redeemStatus.style.fontSize = '0.8rem';
-    redeemStatus.style.color = '#555';
-    redeemStatus.style.marginTop = '6px';
-    redeemContainer.appendChild(redeemStatus);
-
-    scrollContainer.appendChild(redeemContainer);
-
-    // === Code verificatie + opslag ===
-    const validCodes = {
-      "WHOPPER": 100,
-      "TeamSmartSchoolAchievementsIsGreat": 1000,
-      "HAPPYNEWYEAR2026": 500,
-      "ILoveCookies": 50
-    };
-
-    chrome.storage.local.get(["redeemedCodes", "bonusXP"], (res2) => {
-      const redeemed = res2.redeemedCodes || [];
-      let bonusXP = res2.bonusXP || 0;
-
-      redeemBtn.addEventListener('click', () => {
-        const code = codeInput.value.trim().toUpperCase();
-        if (!code) {
-          redeemStatus.textContent = "⚠️ Vul eerst een code in.";
-          redeemStatus.style.color = "#f57c00";
-          return;
-        }
-
-        if (redeemed.includes(code)) {
-          redeemStatus.textContent = "❌ Code al gebruikt.";
-          redeemStatus.style.color = "#e53935";
-          return;
-        }
-
-        if (validCodes[code]) {
-          const gainedXP = validCodes[code];
-          bonusXP += gainedXP;
-          redeemed.push(code);
-
-          chrome.storage.local.set({ redeemedCodes: redeemed, bonusXP: bonusXP }, () => {
-            redeemStatus.textContent = `✅ ${gainedXP} XP toegevoegd!`;
-            redeemStatus.style.color = "#43a047";
-            codeInput.value = '';
-
-            // Herlaad menu (zodat XP direct wordt geüpdatet)
-            setTimeout(() => location.reload(), 800);
-          });
-        } else {
-          redeemStatus.textContent = "❌ Ongeldige code.";
-          redeemStatus.style.color = "#e53935";
-        }
-      });
-    });
-
 })();
