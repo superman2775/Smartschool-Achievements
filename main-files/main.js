@@ -645,7 +645,7 @@ Author: @superman2775 +@broodje565
                 hash: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
                 metadata: JSON.stringify({
                   icon: "results",
-                  iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement.png?raw=true",
+                  iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement-500x500.png?raw=true",
                   title: `🏆 Nieuw achievement behaald!`,
                   description: `${a.title} – ${a.desc} (+${a.xp} XP)`,
                   date: new Date().toLocaleString(),
@@ -667,7 +667,7 @@ Author: @superman2775 +@broodje565
                 hash: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
                 metadata: JSON.stringify({
                   icon: "results",
-                  iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement.png?raw=true",
+                  iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement-500x500.png?raw=true",
                   title: `🧠 Level Up!`,
                   description: `Je hebt level ${level} bereikt!`,
                   date: new Date().toLocaleString(),
