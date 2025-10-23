@@ -556,7 +556,7 @@ Author: @superman2775 +@broodje565
             redeemStatus.style.color = "#e53935";
           }
 
-          if (code === "DISCORDJOIN") {
+          if (code === "JOINTHEDISCORDANDGETACHIEVEMENT") { //bruh i made a huge miss steak here
             chrome.storage.local.set({ joinedDiscord: true }, () => {
               redeemStatus.textContent = "✅ Discord achievement ontgrendeld!";
               redeemStatus.style.color = "#43a047";
