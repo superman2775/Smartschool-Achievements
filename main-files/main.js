@@ -96,7 +96,7 @@ Author: @superman2775 +@broodje565
       menu.appendChild(separator);
 
       // === DATA OPHALEN ===
-      chrome.storage.local.get(["buizenCount", "hundredPercentCount", "apiAssignmentFinishCallCount", "visitNews", "visitMail", "visitMyDocs", "visitHandleiding", "visitOnlineSessions", "visitResults", "visitPlanner", "visitWopiCount", "redeemedCodes", "bonusXP", "joinedDiscord"], (res) => {
+      chrome.storage.local.get(["buizenCount", "hundredPercentCount", "apiAssignmentFinishCallCount", "visitNews", "visitMail", "visitMyDocs", "visitHandleiding", "visitOnlineSessions", "visitResults", "visitPlanner", "visitIntradesk", "visitWopiCount", "redeemedCodes", "bonusXP", "joinedDiscord"], (res) => {
 
         const buizen = res.buizenCount || 0;
         const hundredPercent = res.hundredPercentCount || 0;
@@ -108,6 +108,7 @@ Author: @superman2775 +@broodje565
         const visitOnlineSessions = res.visitOnlineSessions || 0;
         const visitResults = res.visitResults || 0;
         const visitPlanner = res.visitPlanner || 0;
+        const visitIntradesk = res.visitIntradesk || 0;
         const visitWopiCount = res.visitWopiCount || 0;
 
         // === ACHIEVEMENTS ===
@@ -322,6 +323,13 @@ Author: @superman2775 +@broodje565
               progress: visitPlanner * 100,
               secret: true,
               xp: 10
+            },
+            {
+              title: "🗂️ Fake OneDrive 2.0",
+              desc: "Bekijk de Intradesk.",
+              progress: visitIntradesk * 100,
+              secret: true,
+              xp: 20
             },
             {
               title: "🌡️ Room temperature IQ", //Steven He reference again

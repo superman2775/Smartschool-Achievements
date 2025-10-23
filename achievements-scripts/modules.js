@@ -18,7 +18,8 @@ Author: @superman2775 + @broodje565
     { name: 'visitHandleiding', match: '/?module=Manual&file=manual&function=main' },
     { name: 'visitOnlineSessions', match: '/online-session' },
     { name: 'visitResults', match: '/results' },
-    { name: 'visitPlanner', match: '/planner' }
+    { name: 'visitPlanner', match: '/planner' },
+    { name: 'visitIntradesk', match: '/intradesk' },
   ];
 
   function checkPageAndStore() {
