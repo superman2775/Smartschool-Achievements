@@ -135,3 +135,6 @@
         - 25 keer afwezig
     - Phantom
         - 50 keer afwezig
+
+    - Week streak
+    - Early bird

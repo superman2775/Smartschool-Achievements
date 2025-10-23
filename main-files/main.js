@@ -96,7 +96,7 @@ Author: @superman2775 +@broodje565
       menu.appendChild(separator);
 
       // === DATA OPHALEN ===
-      chrome.storage.local.get(["buizenCount", "hundredPercentCount", "apiAssignmentFinishCallCount", "visitNews", "visitMail", "visitMyDocs", "visitHandleiding", "visitOnlineSessions", "visitResults", "visitPlanner", "visitWopiCount", "redeemedCodes", "bonusXP"], (res) => {
+      chrome.storage.local.get(["buizenCount", "hundredPercentCount", "apiAssignmentFinishCallCount", "visitNews", "visitMail", "visitMyDocs", "visitHandleiding", "visitOnlineSessions", "visitResults", "visitPlanner", "visitWopiCount", "redeemedCodes", "bonusXP", "joinedDiscord"], (res) => {
 
         const buizen = res.buizenCount || 0;
         const hundredPercent = res.hundredPercentCount || 0;
@@ -331,6 +331,13 @@ Author: @superman2775 +@broodje565
               xp: 200
             },
             {
+            title: "💬 Join the Discord",
+            desc: "Join de Discord server.",
+            progress: res.joinedDiscord ? 100 : 0, //standaard niet behaald, maar wordt toegekend via code "JOINTHEDISCORDANDGETACHIEVEMENT"
+            secret: true,
+            xp: 1000
+            },
+            {
               title: "🏆 De ultieme student",
               desc: "Ontgrendel alle andere achievements.",
               progress: 0,
@@ -512,7 +519,8 @@ Author: @superman2775 +@broodje565
           "HAPPYNEWYEAR2026": 500,
           "SUMMERVIBES2026": 250,
           "BACK2SCHOOL2026": 250,
-          "LUCKYUSER10000": 1000
+          "LUCKYUSER1000": 1000,
+          "JOINTHEDISCORDANDGETACHIEVEMENT": 0,
         };
 
         let redeemed = res.redeemedCodes || [];
@@ -546,6 +554,15 @@ Author: @superman2775 +@broodje565
           } else {
             redeemStatus.textContent = "❌ Ongeldige code.";
             redeemStatus.style.color = "#e53935";
+          }
+
+          if (code === "DISCORDJOIN") {
+            chrome.storage.local.set({ joinedDiscord: true }, () => {
+              redeemStatus.textContent = "✅ Discord achievement ontgrendeld!";
+              redeemStatus.style.color = "#43a047";
+              codeInput.value = '';
+              setTimeout(() => location.reload(), 800);
+            });
           }
         });
         // === EINDE TOEVOEGING ===
@@ -697,7 +714,6 @@ Author: @superman2775 +@broodje565
             chrome.storage.local.set({ seenAchievements: seen, lastLevel: level });
           });
         })();
-
       });
     }
   }, 200);
