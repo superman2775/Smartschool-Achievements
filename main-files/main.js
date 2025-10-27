@@ -96,7 +96,7 @@ Author: @superman2775 +@broodje565
       menu.appendChild(separator);
 
       // === DATA OPHALEN ===
-      chrome.storage.local.get(["buizenCount", "hundredPercentCount", "apiAssignmentFinishCallCount", "visitNews", "visitMail", "visitMyDocs", "visitHandleiding", "visitOnlineSessions", "visitResults", "visitPlanner", "visitIntradesk", "visitWopiCount", "authorizedPlatforms", "redeemedCodes", "bonusXP", "joinedDiscord"], (res) => {
+      chrome.storage.local.get(["buizenCount", "hundredPercentCount", "apiAssignmentFinishCallCount", "visitNews", "visitMail", "visitMyDocs", "visitHandleiding", "visitOnlineSessions", "visitResults", "visitPlanner", "visitIntradesk", "visitWopiCount", "authorizedPlatformsCount", "redeemedCodes", "bonusXP", "joinedDiscord"], (res) => {
 
         const buizen = res.buizenCount || 0;
         const hundredPercent = res.hundredPercentCount || 0;
@@ -110,7 +110,7 @@ Author: @superman2775 +@broodje565
         const visitPlanner = res.visitPlanner || 0;
         const visitIntradesk = res.visitIntradesk || 0;
         const visitWopiCount = res.visitWopiCount || 0;
-        const authorizedPlatforms = res.authorizedPlatforms || 0;
+        const authorizedPlatformsCount = res.authorizedPlatformsCount || 0;
 
         // === ACHIEVEMENTS ===
         const achievements = [
@@ -279,24 +279,24 @@ Author: @superman2775 +@broodje565
             {
               title: "🔗 Connected",
               desc: "Verbind je account met 1 platform.",
-              progress: Math.min((authorizedPlatforms / 1) * 100, 100),
+              progress: Math.min((authorizedPlatformsCount / 1) * 100, 100),
             },
             {
               title: "🔗 Networker",
               desc: "Verbind je account met 5 platformen.",
-              progress: Math.min((authorizedPlatforms / 5) * 100, 100),
+              progress: Math.min((authorizedPlatformsCount / 5) * 100, 100),
               xp: 25
             },
             {
               title: "🔗 Interconnected",
               desc: "Verbind je account met 10 platformen.",
-              progress: Math.min((authorizedPlatforms / 10) * 100, 100),
+              progress: Math.min((authorizedPlatformsCount / 10) * 100, 100),
               xp: 50
             },
             {
               title: "🔗 Always connected",
               desc: "Verbind je account met 15 platformen.",
-              progress: Math.min((authorizedPlatforms / 15) * 100, 100),
+              progress: Math.min((authorizedPlatformsCount / 15) * 100, 100),
               xp: 100
             },
             {
