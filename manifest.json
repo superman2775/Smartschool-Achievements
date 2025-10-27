@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Smartschool Achievements",
   "version": "1.0",
-  "description": "Voeg achievements toe aan Smartschool.",
+  "description": "Voeg achievements toe aan Smartschool!",
   "background": {
     "service_worker": "achievements-scripts/assignment-finish.js"
   },
