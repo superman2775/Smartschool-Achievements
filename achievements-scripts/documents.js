@@ -1,3 +1,9 @@
+/* This file is part of Smartschool Achievements.
+Don't use this file without permission
+Author: @superman2775 + @broodje565
+*/
+
+//this script works, so don't touch it
 (function () {
   'use strict';
 

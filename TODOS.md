@@ -1,3 +1,2 @@
 - Streaks (idk if i should make this)
 - Leaderboards (lots of people can cheat)
-- Make notifications when you reach achievement (imma make this now)
