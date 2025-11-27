@@ -138,3 +138,6 @@
 
     - Week streak
     - Early bird
+
+- Berichten sturen
+    - Bruh idk :skull:

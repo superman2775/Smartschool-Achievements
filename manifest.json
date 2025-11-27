@@ -15,6 +15,13 @@
   ],
   "content_scripts": [
     {
+      "matches": ["*://*.smartschool.be/login"],
+      "js": [
+        "achievements-scripts/login.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
       "matches": ["*://*.smartschool.be/*"],
       "exclude_matches": ["*://*.smartschool.be/login"],
       "js": [

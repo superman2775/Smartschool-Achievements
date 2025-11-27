@@ -3,6 +3,7 @@ Don't use this file without permission
 Author: @superman2775 +@broodje565
 */
 
+//Life is like a GitHub repo: nothing is gonna change if you don't commit.
 (function () {
   'use strict';
 
@@ -96,7 +97,7 @@ Author: @superman2775 +@broodje565
       menu.appendChild(separator);
 
       // === DATA OPHALEN ===
-      chrome.storage.local.get(["buizenCount", "hundredPercentCount", "apiAssignmentFinishCallCount", "visitNews", "visitMail", "visitMyDocs", "visitHandleiding", "visitOnlineSessions", "visitResults", "visitPlanner", "visitIntradesk", "visitWopiCount", "authorizedPlatformsCount", "redeemedCodes", "bonusXP", "joinedDiscord"], (res) => {
+      chrome.storage.local.get(["buizenCount", "hundredPercentCount", "apiAssignmentFinishCallCount", "visitNews", "visitMail", "visitMyDocs", "visitHandleiding", "visitOnlineSessions", "visitResults", "visitPlanner", "visitIntradesk", "visitWopiCount", "authorizedPlatformsCount","visitLoginCount" , "redeemedCodes", "bonusXP", "joinedDiscord"], (res) => {
 
         const buizen = res.buizenCount || 0;
         const hundredPercent = res.hundredPercentCount || 0;
@@ -111,6 +112,7 @@ Author: @superman2775 +@broodje565
         const visitIntradesk = res.visitIntradesk || 0;
         const visitWopiCount = res.visitWopiCount || 0;
         const authorizedPlatformsCount = res.authorizedPlatformsCount || 0;
+        const visitLoginCount = res.visitLoginCount || 0;
 
         // === ACHIEVEMENTS ===
         const achievements = [
@@ -298,6 +300,42 @@ Author: @superman2775 +@broodje565
               desc: "Verbind je account met 15 platformen.",
               progress: Math.min((authorizedPlatformsCount / 15) * 100, 100),
               xp: 100
+            },
+            {
+              title: "🔑 Welcome!",
+              desc: "Log 1 keer in op Smartschool.",
+              progress: Math.min((visitLoginCount / 1) * 100, 100),
+              xp: 10
+            },
+            {
+              title: "🔑 Remember password?",
+              desc: "Log 5 keer in op Smartschool.",
+              progress: Math.min((visitLoginCount / 5) * 100, 100),
+              xp: 25
+            },
+            {
+              title: "🔑 Back!",
+              desc: "Log 10 keer in op Smartschool.",
+              progress: Math.min((visitLoginCount / 10) * 100, 100),
+              xp: 50
+            },
+            {
+              title: "🔑 Routine",
+              desc: "Log 50 keer in op Smartschool.",
+              progress: Math.min((visitLoginCount / 50) * 100, 100),
+              xp: 75
+            },
+            {
+              title: "🔑 Ah sh*t, here we go again",
+              desc: "Log 250 keer in op Smartschool.",
+              progress: Math.min((visitLoginCount / 250) * 100, 100),
+              xp: 100
+            },
+            {
+              title: "🔑 SCHOOL IS FREAKING ME OUT!",
+              desc: "Log 500 keer in op Smartschool.",
+              progress: Math.min((visitLoginCount / 500) * 100, 100),
+              xp: 200
             },
             {
               title: "📰 What's the news?",
