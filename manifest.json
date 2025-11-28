@@ -30,6 +30,7 @@
         "achievements-scripts/results.js",
         "achievements-scripts/modules.js",
         "achievements-scripts/streak.js",
+        "achievements-scripts/berichten.js",
         "main-files/main.js"
       ],
       "run_at": "document_start"
