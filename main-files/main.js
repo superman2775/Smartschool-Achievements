@@ -113,6 +113,7 @@ Author: @superman2775 +@broodje565
         const visitWopiCount = res.visitWopiCount || 0;
         const authorizedPlatformsCount = res.authorizedPlatformsCount || 0;
         const visitLoginCount = res.visitLoginCount || 0;
+        const dailyStreak = res.dailyStreak || 0;
 
         // === ACHIEVEMENTS ===
         const achievements = [
