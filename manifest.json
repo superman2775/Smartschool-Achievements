@@ -29,6 +29,7 @@
         "achievements-scripts/oauth.js",
         "achievements-scripts/results.js",
         "achievements-scripts/modules.js",
+        "achievements-scripts/streak.js",
         "main-files/main.js"
       ],
       "run_at": "document_start"

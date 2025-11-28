@@ -401,11 +401,46 @@ Author: @superman2775 +@broodje565
               xp: 200
             },
             {
-            title: "💬 Join the Discord",
-            desc: "Join de Discord server.",
-            progress: res.joinedDiscord ? 100 : 0, //standaard niet behaald, maar wordt toegekend via code "JOINTHEDISCORDANDGETACHIEVEMENT"
-            secret: true,
-            xp: 1000
+              title: "💬 Join the Discord",
+              desc: "Join de Discord server.",
+              progress: res.joinedDiscord ? 100 : 0, //standaard niet behaald, maar wordt toegekend via code "JOINTHEDISCORDANDGETACHIEVEMENT"
+              secret: true,
+              xp: 1000
+            },
+            {
+              title: "🔥 3 in a row!",
+              desc: "Log 3 dagen achter elkaar in op Smartschool.",
+              progress: Math.min((dailyStreak / 3) * 100, 100),
+              secret: true,
+              xp: 10
+            },
+            {
+              title: "🔥 Full week streak!",
+              desc: "Log 7 dagen achter elkaar in op Smartschool.",
+              progress: Math.min((dailyStreak / 7) * 100, 100),
+              secret: true,
+              xp: 25
+            },
+            {
+              title: "🔥 2 weeks in a row!",
+              desc: "Log 14 dagen achter elkaar in op Smartschool.",
+              progress: Math.min((dailyStreak / 14) * 100, 100),
+              secret: true,
+              xp: 50
+            },
+            {
+              title: "🔥 A MONTH?!",
+              desc: "Log 30 dagen achter elkaar in op Smartschool.",
+              progress: Math.min((dailyStreak / 30) * 100, 100),
+              secret: true,
+              xp: 100
+            },
+            {
+              title: "🔥 Addicted",
+              desc: "Log 60 dagen achter elkaar in op Smartschool.",
+              progress: Math.min((dailyStreak / 60) * 100, 100),
+              secret: true,
+              xp: 250
             },
             {
               title: "🏆 De ultieme student",
