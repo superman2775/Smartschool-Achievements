@@ -3,7 +3,7 @@ Don't use this file without permission
 Author: @superman2775 + @broodje565
 */
 
-
+//this script works, so don't touch it
 function updateDailyStreak() {
     const today = new Date();
     const todayKey = today.toDateString(); // e.g. "Mon Jan 01 2025"
