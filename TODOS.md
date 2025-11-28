@@ -1,2 +1,2 @@
-- Streaks (idk if i should make this)
+- Streaks (This is my next victim, and after this i'll do Berichten.)
 - Leaderboards (lots of people can cheat)
