@@ -1,2 +1,3 @@
 - Streaks (This is my next victim, and after this i'll do Berichten.)
 - Leaderboards (lots of people can cheat)
+- Shit van dezelfde categorie inklapbaar maken want dit is echt chaos

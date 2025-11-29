@@ -196,12 +196,6 @@ Author: @superman2775 +@broodje565
               xp: 150
             },
             {
-              title: "⬇️ + 200 XP!",
-              desc: "Download Smartschool Achievements.",
-              progress: 100,
-              xp: 200
-            },
-            {
               title: "✅ One down!",
               desc: "Werk 1 taak af.",
               progress: Math.min((apiAssignmentFinishCallCount / 1) * 100, 100),
@@ -336,6 +330,12 @@ Author: @superman2775 +@broodje565
               title: "🔑 SCHOOL IS FREAKING ME OUT!",
               desc: "Log 500 keer in op Smartschool.",
               progress: Math.min((visitLoginCount / 500) * 100, 100),
+              xp: 200
+            },
+            {
+              title: "⬇️ + 200 XP!",
+              desc: "Download Smartschool Achievements.",
+              progress: 100,
               xp: 200
             },
             {
