@@ -3,63 +3,101 @@ Don't use this file without permission
 Author: @superman2775 + @broodje565
 */
 
-//this script works, so don't touch it
-function updateDailyStreak() {
-    const today = new Date();
-    const todayKey = today.toDateString(); // e.g. "Mon Jan 01 2025"
+(function () {
+  'use strict';
+
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const TIMEZONE = 'Europe/Brussels'; // CET/CEST
+  const KEYS = ['lastLogin', 'streak', 'highestStreak'];
+
+  // return YYYY-MM-DD in CET/CEST
+  function dateIsoInCET(date = new Date()) {
+    return new Date(date).toLocaleDateString('en-CA', { timeZone: TIMEZONE });
+  }
+
+  // convert YYYY-MM-DD to day count (UTC days)
+  function isoToDayCount(iso) {
+    if (!iso || typeof iso !== 'string') return null;
+    const p = iso.split('-').map(Number);
+    if (p.length !== 3 || p.some(isNaN)) return null;
+    return Math.floor(Date.UTC(p[0], p[1] - 1, p[2]) / MS_PER_DAY);
+  }
+
+  // normalize stored value to YYYY-MM-DD (CET) if possible
+  function normalizeStoredDate(val) {
+    if (!val) return null;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return null;
+    return dateIsoInCET(d);
+  }
+
+  function updateDailyStreak() {
+    const todayIso = dateIsoInCET();
+    const todayDay = isoToDayCount(todayIso);
 
     return new Promise((resolve) => {
-        chrome.storage.local.get(
-            ["lastLogin", "streak", "highestStreak"],
-            (data) => {
+      chrome.storage.local.get(KEYS, (data) => {
+        try {
+          const rawLast = data.lastLogin || null;
+          let streak = Number.isFinite(Number(data.streak)) ? parseInt(data.streak, 10) : 0;
+          let highest = Number.isFinite(Number(data.highestStreak)) ? parseInt(data.highestStreak, 10) : 0;
 
-                const lastLogin = data.lastLogin || null;
-                let streak = parseInt(data.streak || "0");
-                let highestStreak = parseInt(data.highestStreak || "0");
+          if (!rawLast) {
+            streak = 1;
+            highest = Math.max(highest, streak);
+            chrome.storage.local.set({ lastLogin: todayIso, streak, highestStreak: highest }, () => {
+              resolve({ streak, highest, firstLogin: true });
+            });
+            return;
+          }
 
-                // First time login ever
-                if (!lastLogin) {
-                    streak = 1;
-                    highestStreak = 1;
-                    chrome.storage.local.set({
-                        lastLogin: todayKey,
-                        streak,
-                        highestStreak
-                    }, () => {
-                        resolve({ streak, highestStreak, firstLogin: true });
-                    });
-                    return;
-                }
+          const lastIso = normalizeStoredDate(rawLast);
+          if (!lastIso) {
+            streak = 1;
+            highest = Math.max(highest, streak);
+            chrome.storage.local.set({ lastLogin: todayIso, streak, highestStreak: highest }, () => {
+              resolve({ streak, highest, fixedMalformedDate: true });
+            });
+            return;
+          }
 
-                const last = new Date(lastLogin);
+          const lastDay = isoToDayCount(lastIso);
+          if (lastDay === null) {
+            streak = 1;
+            highest = Math.max(highest, streak);
+            chrome.storage.local.set({ lastLogin: todayIso, streak, highestStreak: highest }, () => {
+              resolve({ streak, highest, fallbackReset: true });
+            });
+            return;
+          }
 
-                const diffTime = today - last;
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+          const diff = todayDay - lastDay;
 
-                if (diffDays === 0) {
-                    // Already logged in today – no change
-                    resolve({ streak, highestStreak, alreadyLoggedToday: true });
-                    return;
-                }
+          if (diff === 0) {
+            resolve({ streak, highest, alreadyLoggedToday: true });
+            return;
+          }
 
-                if (diffDays === 1) {
-                    streak += 1; // increase streak
-                } else {
-                    streak = 1; // reset streak
-                }
+          if (diff === 1) streak = streak + 1;
+          else streak = 1;
 
-                if (streak > highestStreak) {
-                    highestStreak = streak;
-                }
+          if (streak > highest) highest = streak;
 
-                chrome.storage.local.set({
-                    lastLogin: todayKey,
-                    streak,
-                    highestStreak
-                }, () => {
-                    resolve({ streak, highestStreak, updated: true });
-                });
-            }
-        );
+          chrome.storage.local.set({ lastLogin: todayIso, streak, highestStreak: highest }, () => {
+            resolve({ streak, highest, updated: true });
+          });
+        } catch (err) {
+          console.error('[streak] update failed', err);
+          resolve({ error: String(err) });
+        }
+      });
     });
-}
+  }
+
+  // auto-run on load
+  updateDailyStreak().then(res => console.debug('[streak] result', res));
+
+  // expose for manual testing
+  window.__Streak = { updateDailyStreak, dateIsoInCET };
+})();
