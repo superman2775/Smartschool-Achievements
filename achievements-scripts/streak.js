@@ -96,7 +96,7 @@ Author: @superman2775 + @broodje565
   }
 
   // auto-run on load
-  updateDailyStreak().then(res => console.debug('[streak] result', res));
+  updateDailyStreak().then(res => console.debug('[Achievements] streak', res));
 
   // expose for manual testing
   window.__Streak = { updateDailyStreak, dateIsoInCET };

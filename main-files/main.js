@@ -277,6 +277,7 @@ Author: @superman2775 +@broodje565
               title: "🔗 Connected",
               desc: "Verbind je account met 1 platform.",
               progress: Math.min((authorizedPlatformsCount / 1) * 100, 100),
+              xp: 10
             },
             {
               title: "🔗 Networker",
