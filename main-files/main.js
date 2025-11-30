@@ -517,7 +517,7 @@ Author: @superman2775 +@broodje565
             status.textContent = "✅ Voltooid";
             status.style.background = '#43a047';
           } else if (a.progress <= 0) {
-            status.textContent = "🔒 Niet gestart";
+            status.textContent = "❌ Niet gestart";
             status.style.background = '#757575';
           } else {
             status.textContent = "⏳ Bezig";
