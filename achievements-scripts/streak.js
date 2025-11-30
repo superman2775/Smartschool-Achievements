@@ -8,50 +8,58 @@ function updateDailyStreak() {
     const today = new Date();
     const todayKey = today.toDateString(); // e.g. "Mon Jan 01 2025"
 
-    // Load stored values
-    const lastLogin = localStorage.getItem("lastLogin");
-    let streak = parseInt(localStorage.getItem("streak") || "0");
-    let highestStreak = parseInt(localStorage.getItem("highestStreak") || "0");
+    return new Promise((resolve) => {
+        chrome.storage.local.get(
+            ["lastLogin", "streak", "highestStreak"],
+            (data) => {
 
-    // First time login ever
-    if (!lastLogin) {
-        streak = 1;
-        highestStreak = 1;
-        localStorage.setItem("lastLogin", todayKey);
-        localStorage.setItem("streak", streak);
-        localStorage.setItem("highestStreak", highestStreak);
-        return { streak, highestStreak, firstLogin: true };
-    }
+                const lastLogin = data.lastLogin || null;
+                let streak = parseInt(data.streak || "0");
+                let highestStreak = parseInt(data.highestStreak || "0");
 
-    // Convert date strings to actual dates
-    const last = new Date(lastLogin);
+                // First time login ever
+                if (!lastLogin) {
+                    streak = 1;
+                    highestStreak = 1;
+                    chrome.storage.local.set({
+                        lastLogin: todayKey,
+                        streak,
+                        highestStreak
+                    }, () => {
+                        resolve({ streak, highestStreak, firstLogin: true });
+                    });
+                    return;
+                }
 
-    // Check difference in days
-    const diffTime = today - last;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                const last = new Date(lastLogin);
 
-    if (diffDays === 0) {
-        // Already logged in today – no change
-        return { streak, highestStreak, alreadyLoggedToday: true };
-    } 
-    
-    if (diffDays === 1) {
-        // Logged in yesterday → increase streak
-        streak += 1;
-    } else {
-        // Missed one or more days → reset streak
-        streak = 1;
-    }
+                const diffTime = today - last;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    // Update highest streak
-    if (streak > highestStreak) {
-        highestStreak = streak;
-    }
+                if (diffDays === 0) {
+                    // Already logged in today – no change
+                    resolve({ streak, highestStreak, alreadyLoggedToday: true });
+                    return;
+                }
 
-    // Save updates
-    localStorage.setItem("lastLogin", todayKey);
-    localStorage.setItem("streak", streak);
-    localStorage.setItem("highestStreak", highestStreak);
+                if (diffDays === 1) {
+                    streak += 1; // increase streak
+                } else {
+                    streak = 1; // reset streak
+                }
 
-    return { streak, highestStreak, updated: true };
+                if (streak > highestStreak) {
+                    highestStreak = streak;
+                }
+
+                chrome.storage.local.set({
+                    lastLogin: todayKey,
+                    streak,
+                    highestStreak
+                }, () => {
+                    resolve({ streak, highestStreak, updated: true });
+                });
+            }
+        );
+    });
 }
