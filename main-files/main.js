@@ -113,7 +113,7 @@ Author: @superman2775 +@broodje565
         const visitWopiCount = res.visitWopiCount || 0;
         const authorizedPlatformsCount = res.authorizedPlatformsCount || 0;
         const visitLoginCount = res.visitLoginCount || 0;
-        const dailyStreak = res.dailyStreak || 0;
+        const highestStreak = res.highestStreak || 0;
 
         // === ACHIEVEMENTS ===
         const achievements = [
@@ -411,35 +411,35 @@ Author: @superman2775 +@broodje565
             {
               title: "🔥 3 in a row!",
               desc: "Log 3 dagen achter elkaar in op Smartschool.",
-              progress: Math.min((dailyStreak / 3) * 100, 100),
+              progress: Math.min((highestStreak / 3) * 100, 100),
               secret: true,
               xp: 10
             },
             {
               title: "🔥 Full week streak!",
               desc: "Log 7 dagen achter elkaar in op Smartschool.",
-              progress: Math.min((dailyStreak / 7) * 100, 100),
+              progress: Math.min((highestStreak / 7) * 100, 100),
               secret: true,
               xp: 25
             },
             {
               title: "🔥 2 weeks in a row!",
               desc: "Log 14 dagen achter elkaar in op Smartschool.",
-              progress: Math.min((dailyStreak / 14) * 100, 100),
+              progress: Math.min((highestStreak / 14) * 100, 100),
               secret: true,
               xp: 50
             },
             {
               title: "🔥 A MONTH?!",
               desc: "Log 30 dagen achter elkaar in op Smartschool.",
-              progress: Math.min((dailyStreak / 30) * 100, 100),
+              progress: Math.min((highestStreak / 30) * 100, 100),
               secret: true,
               xp: 100
             },
             {
               title: "🔥 Addicted",
               desc: "Log 60 dagen achter elkaar in op Smartschool.",
-              progress: Math.min((dailyStreak / 60) * 100, 100),
+              progress: Math.min((highestStreak / 60) * 100, 100),
               secret: true,
               xp: 250
             },
