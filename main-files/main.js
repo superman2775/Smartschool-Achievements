@@ -725,7 +725,7 @@ Author: @superman2775 +@broodje565
     // duplicates weg
     keys = [...new Set(keys)];
 
-    // Smartschool 2024/2025: echte meldingen arrays detecteren
+    // Meldingen arrays detecteren
     for (const key of keys) {
       try {
         const val = sessionStorage.getItem(key);
