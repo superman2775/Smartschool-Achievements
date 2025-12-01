@@ -696,131 +696,134 @@ Author: @superman2775 +@broodje565
         wrapper.appendChild(menuWrapper);
 
         // === AUTOMATISCHE MELDINGEN BIJ NIEUWE ACHIEVEMENTS / LEVEL-UP ===
-        (function() {
-          // Vind automatisch de session key in sessionStorage
-          function findSessionKey() {
-          const reHex32 = /^[0-9a-f]{32}$/i;
-          const suffixBlacklist = ["MessagesCounter", "queueUuid"];
+(function () {
+  function findSessionKey() {
+    const reHex32 = /^[0-9a-f]{32}$/i;
+    const suffixBlacklist = ["MessagesCounter", "queueUuid"];
 
-          let candidateKeys = [];
+    let keys = [];
 
-          for (let i = 0; i < sessionStorage.length; i++) {
-            const key = sessionStorage.key(i);
-            if (!key) continue;
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const rawKey = sessionStorage.key(i);
+      if (!rawKey) continue;
 
-            // Alleen pure 32-character hexkeys
-            if (reHex32.test(key)) {
-              candidateKeys.push(key);
-              continue;
-            }
+      let key = rawKey;
 
-            // Als het iets is zoals e9ec3b85f31f03bfb58f96d8e56c28c9MessagesCounter
-            // halen we de prefix (voor de suffix) eruit
-            for (const suffix of suffixBlacklist) {
-              if (key.endsWith(suffix)) {
-                const prefix = key.replace(suffix, "");
-                if (reHex32.test(prefix)) {
-                  candidateKeys.push(prefix);
-                }
-              }
-            }
-          }
-
-          // Verwijder duplicaten
-          candidateKeys = [...new Set(candidateKeys)];
-
-          if (candidateKeys.length === 0) return null;
-
-          // Meestal is de juiste de langstlevende sessie → pak de eerste die '[]' als inhoud heeft
-          for (const key of candidateKeys) {
-            const val = sessionStorage.getItem(key);
-            if (val && val.trim() === "[]") return key;
-          }
-
-          // fallback: pak gewoon de eerste geldige key
-          return candidateKeys[0];
+      // strip suffixes zoals "...MessagesCounter"
+      for (const suffix of suffixBlacklist) {
+        if (rawKey.endsWith(suffix)) {
+          key = rawKey.slice(0, -suffix.length);
         }
+      }
 
+      // alleen pure hex keys toelaten
+      if (!reHex32.test(key)) continue;
 
-          const key = findSessionKey();
-          if (!key) {
-            console.warn("[Achievements] Geen session key gevonden voor meldingen.");
-            return;
-          }
+      keys.push(key);
+    }
 
-          // Lees vorige status uit storage om te weten welke achievements nieuw zijn
-          chrome.storage.local.get(["seenAchievements", "lastLevel"], (old) => {
-            const seen = old.seenAchievements || [];
-            const lastLevel = old.lastLevel || 0;
+    // duplicates weg
+    keys = [...new Set(keys)];
 
-            // Controleer op nieuwe achievements
-            const newlyCompleted = achievements.filter(a => a.progress >= 100 && !seen.includes(a.title));
+    // Smartschool 2024/2025: echte meldingen arrays detecteren
+    for (const key of keys) {
+      try {
+        const val = sessionStorage.getItem(key);
+        if (!val) continue;
 
-            // Meldingen aanmaken
-            const now = new Date().toISOString();
-            const notifications = [];
+        const parsed = JSON.parse(val);
+        if (Array.isArray(parsed)) {
+          return key; // correcte key gevonden
+        }
+      } catch {}
+    }
 
-            newlyCompleted.forEach(a => {
-              notifications.push({
-                ssid: 2237,
-                userid: 8772,
-                userlt: 0,
-                created: now,
-                hash: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
-                metadata: JSON.stringify({
-                  icon: "results",
-                  iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement-500x500.png?raw=true",
-                  title: `🏆 Nieuw achievement behaald!`,
-                  description: `${a.title} – ${a.desc} (+${a.xp} XP)`,
-                  date: new Date().toLocaleString(),
-                  url: "/",
-                  urlTarget: "_self"
-                }),
-                unread: true
-              });
-              seen.push(a.title);
-            });
+    return null;
+  }
 
-            // Check voor level-up
-            if (level > lastLevel) {
-              notifications.push({
-                ssid: 2237,
-                userid: 8772,
-                userlt: 0,
-                created: now,
-                hash: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
-                metadata: JSON.stringify({
-                  icon: "results",
-                  iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement-500x500.png?raw=true",
-                  title: `🧠 Level Up!`,
-                  description: `Je hebt level ${level} bereikt!`,
-                  date: new Date().toLocaleString(),
-                  url: "/",
-                  urlTarget: "_self"
-                }),
-                unread: true
-              });
-            }
+  const key = findSessionKey();
+  if (!key) {
+    console.warn("[Achievements] ❌ Geen session key gevonden voor meldingen.");
+    return;
+  }
 
-            // Niets te melden → stop
-            if (notifications.length === 0) return;
+  // Lees vorige status
+  chrome.storage.local.get(["seenAchievements", "lastLevel"], (old) => {
+    const seen = old.seenAchievements || [];
+    const lastLevel = old.lastLevel || 0;
 
-            // Zet alle meldingen in sessionStorage
-            try {
-              const existing = JSON.parse(sessionStorage.getItem(key) || "[]");
-              const merged = existing.concat(notifications);
-              sessionStorage.setItem(key, JSON.stringify(merged));
-              console.log(`[Achievements] ${notifications.length} melding(en) toegevoegd onder key ${key}`);
-              // herlaad zodat Smartschool de nieuwe meldingen toont
-              location.reload();
-            } catch (err) {
-              console.error("[Achievements] Fout bij opslaan notificaties:", err);
-            }
+    // Nieuwe achievements
+    const newlyCompleted = achievements.filter(a => a.progress >= 100 && !seen.includes(a.title));
 
-            // Sla nieuwe status op
-            chrome.storage.local.set({ seenAchievements: seen, lastLevel: level });
-          });
-        })();
+    const now = new Date().toISOString();
+    const notifications = [];
+
+    // Achievement meldingen
+    newlyCompleted.forEach(a => {
+      notifications.push({
+        ssid: 2237,
+        userid: 8772,
+        userlt: 0,
+        created: now,
+        hash: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
+        metadata: JSON.stringify({
+          icon: "results",
+          iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement-500x500.png?raw=true",
+          title: "🏆 Nieuw achievement behaald!",
+          description: `${a.title} – ${a.desc} (+${a.xp} XP)`,
+          date: new Date().toLocaleString(),
+          url: "/",
+          urlTarget: "_self"
+        }),
+        unread: true
+      });
+      seen.push(a.title);
+    });
+
+    // Level-up melding
+    if (level > lastLevel) {
+      notifications.push({
+        ssid: 2237,
+        userid: 8772,
+        userlt: 0,
+        created: now,
+        hash: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
+        metadata: JSON.stringify({
+          icon: "results",
+          iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement-500x500.png?raw=true",
+          title: "🧠 Level Up!",
+          description: `Je hebt level ${level} bereikt!`,
+          date: new Date().toLocaleString(),
+          url: "/",
+          urlTarget: "_self"
+        }),
+        unread: true
+      });
+    }
+
+    // Niets om te melden → stop
+    if (notifications.length === 0) return;
+
+    // Opslaan in sessionStorage
+    try {
+      const existing = JSON.parse(sessionStorage.getItem(key) || "[]");
+      const merged = existing.concat(notifications);
+
+      sessionStorage.setItem(key, JSON.stringify(merged));
+
+      console.log(`[Achievements] ✅ ${notifications.length} melding(en) toegevoegd onder key ${key}`);
+
+      // Smartschool UI refresh
+      location.reload();
+    } catch (err) {
+      console.error("[Achievements] Fout bij opslaan notificaties:", err);
+    }
+
+    // Nieuwe status opslaan
+    chrome.storage.local.set({ seenAchievements: seen, lastLevel: level });
+  });
+})();
+
       });
     }
   }, 200);
