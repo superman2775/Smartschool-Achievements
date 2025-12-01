@@ -8,8 +8,7 @@ Only report about the latest beta version, or release.
 | ------- | ------------------ |
 |Release  | :white_check_mark: |
 |Beta     | :white_check_mark: |
-|Branch   | :x: |
-| < 4.0   | :x:                |
+|Random Branch   | :x: |
 
 ## Reporting a Vulnerability
 
