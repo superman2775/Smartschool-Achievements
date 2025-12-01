@@ -97,7 +97,24 @@ Author: @superman2775 +@broodje565
       menu.appendChild(separator);
 
       // === DATA OPHALEN ===
-      chrome.storage.local.get(["buizenCount", "hundredPercentCount", "apiAssignmentFinishCallCount", "visitNews", "visitMail", "visitMyDocs", "visitHandleiding", "visitOnlineSessions", "visitResults", "visitPlanner", "visitIntradesk", "visitWopiCount", "authorizedPlatformsCount","visitLoginCount", "highestStreak", "redeemedCodes", "bonusXP", "joinedDiscord"], (res) => {
+      chrome.storage.local.get(["buizenCount", 
+                                "hundredPercentCount", 
+                                "apiAssignmentFinishCallCount", 
+                                "visitNews", 
+                                "visitMail", 
+                                "visitMyDocs", 
+                                "visitHandleiding", 
+                                "visitOnlineSessions", 
+                                "visitResults", 
+                                "visitPlanner", 
+                                "visitIntradesk", 
+                                "visitWopiCount", 
+                                "authorizedPlatformsCount",
+                                "visitLoginCount", 
+                                "highestStreak", 
+                                "redeemedCodes", 
+                                "bonusXP", 
+                                "joinedDiscord"], (res) => {
 
         const buizen = res.buizenCount || 0;
         const hundredPercent = res.hundredPercentCount || 0;
