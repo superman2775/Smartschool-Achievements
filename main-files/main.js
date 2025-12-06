@@ -646,6 +646,7 @@ Author: @superman2775 +@broodje565
           "BACK2SCHOOL2026": 250,
           "LUCKYUSER1000": 1000,
           "JOINTHEDISCORDANDGETACHIEVEMENT": 0,
+          "YOUKNOWITLEARN?": 100,
         };
 
         let redeemed = res.redeemedCodes || [];
