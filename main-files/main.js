@@ -650,7 +650,11 @@ Author: @superman2775 +@broodje565
           "LUCKYUSER500": 500,
           "JOINTHEDISCORDANDGETACHIEVEMENT": 0,
           "ITLEARNISAMAZING": 1000,
-          "SMARTSCHOOLISLIFE": 100
+          "SMARTSCHOOLISLIFE": 100,
+          "EASTER2026": 250,
+          "HALLOWEEN2026": 250,
+          "ANNIVERSARY2026": 500,
+          "SUPERMANBIRTHDAY2026": 1000
         };
 
         let redeemed = res.redeemedCodes || [];
