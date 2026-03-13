@@ -7,6 +7,79 @@ Author: @superman2775 +@broodje565
 (function () {
   'use strict';
 
+  const SUPABASE_URL = 'https://gyyijtmbnnfjnywajbcg.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eWlqdG1ibm5mam55d2FqYmNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjkxMzUsImV4cCI6MjA4OTAwNTEzNX0.FRs1eH7rAZ_EW2dyHtpKfKKsoe5nHQHvSUmZv5TeJCE';
+  const LEADERBOARD_TABLE = 'leaderboard';
+  const LEADERBOARD_SYNC_MS = 6 * 60 * 60 * 1000;
+
+  const LEADERBOARD_NAME_PARTS = {
+    adj: ['Brisk', 'Quiet', 'Solar', 'Nova', 'Iron', 'Swift', 'Wild', 'Lunar', 'Sharp', 'Bold', 'Bright', 'Silent', 'Mighty', 'Clever', 'Fierce', 'Noble', 'Sly', 'Vivid', 'Daring', 'Stealthy'],
+    noun: ['Falcon', 'Comet', 'River', 'Pine', 'Echo', 'Orbit', 'Signal', 'Harbor', 'Glade', 'Forge', 'Shadow', 'Blaze', 'Canyon', 'Meadow', 'Storm', 'Peak', 'Valley', 'Wolf', 'Hawk', 'Sparrow']
+  };
+
+  function createLeaderboardName() {
+    const adj = LEADERBOARD_NAME_PARTS.adj[Math.floor(Math.random() * LEADERBOARD_NAME_PARTS.adj.length)];
+    const noun = LEADERBOARD_NAME_PARTS.noun[Math.floor(Math.random() * LEADERBOARD_NAME_PARTS.noun.length)];
+    const suffix = Math.floor(10 + Math.random() * 90);
+    return `${adj}${noun}${suffix}`;
+  }
+
+  function isSupabaseConfigured() {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return false;
+    if (SUPABASE_URL.includes('YOUR_') || SUPABASE_ANON_KEY.includes('YOUR_')) return false;
+    return SUPABASE_URL.startsWith('https://');
+  }
+
+  function syncLeaderboardLevel(level) {
+    if (!isSupabaseConfigured()) return;
+    if (!Number.isFinite(level)) return;
+
+    chrome.storage.local.get([
+      'ssaLeaderboardClientId',
+      'ssaLeaderboardName',
+      'ssaLeaderboardLastSync',
+      'ssaLeaderboardLastLevel'
+    ], (res) => {
+      const lastSync = res.ssaLeaderboardLastSync || 0;
+      const lastLevel = typeof res.ssaLeaderboardLastLevel === 'number' ? res.ssaLeaderboardLastLevel : -1;
+      const shouldSync = (level !== lastLevel) || (Date.now() - lastSync > LEADERBOARD_SYNC_MS);
+      if (!shouldSync) return;
+
+      const clientId = res.ssaLeaderboardClientId
+        || (typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : Math.random().toString(36).slice(2) + Date.now().toString(36));
+
+      const name = res.ssaLeaderboardName || createLeaderboardName();
+
+      fetch(`${SUPABASE_URL}/rest/v1/${LEADERBOARD_TABLE}?on_conflict=client_id`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify({
+          client_id: clientId,
+          name,
+          level,
+          updated_at: new Date().toISOString()
+        })
+      }).then((resp) => {
+        if (!resp.ok) throw new Error(`Leaderboard sync failed: ${resp.status}`);
+        chrome.storage.local.set({
+          ssaLeaderboardClientId: clientId,
+          ssaLeaderboardName: name,
+          ssaLeaderboardLastSync: Date.now(),
+          ssaLeaderboardLastLevel: level
+        });
+      }).catch((err) => {
+        console.warn('[Achievements] Leaderboard sync failed', err);
+      });
+    });
+  }
+
   const waitForNav = setInterval(() => {
     const linksBtnWrapper = document.querySelector('[data-courses]');
     const messagesBtn = document.querySelector('[data-links]');
@@ -500,6 +573,7 @@ Author: @superman2775 +@broodje565
         const progressPercent = (xpLeft / xpNeededForNextLevel) * 100;
         levelDisplay.textContent = `🧠 Level ${level} (${xpLeft} / ${xpNeededForNextLevel} XP naar level ${level + 1})`;
         levelBar.style.width = `${progressPercent}%`;
+        syncLeaderboardLevel(level);
 
         // === ACHIEVEMENTS MAKEN ===
         achievements.forEach(a => {
@@ -761,10 +835,6 @@ Author: @superman2775 +@broodje565
   background: #ffffff !important;
   background-color: #ffffff !important;
 }
-.ssa-notification-row.ssa-notification-read {
-  background: #f7f7f7 !important;
-  background-color: #f7f7f7 !important;
-}
 `;
             const styleRoot = document.head || document.documentElement;
             if (styleRoot) {
@@ -785,6 +855,7 @@ Author: @superman2775 +@broodje565
 
             container = document.createElement('div');
             container.id = 'ssa-achievements-notifications';
+            container.className = 'notifs-toaster js-focus-trap-allow-outside-click';
             container.style.position = 'fixed';
             container.style.right = '16px';
             container.style.bottom = '16px';
@@ -823,10 +894,10 @@ Author: @superman2775 +@broodje565
             toast.style.border = '1px solid rgba(0,0,0,0.08)';
             toast.style.borderLeft = `4px solid ${typeColor(data.type)}`;
             toast.style.borderRadius = '8px';
-            toast.style.padding = '10px 12px';
-            toast.style.boxShadow = '0 10px 20px rgba(0,0,0,0.08)';
-            toast.style.maxWidth = '320px';
-            toast.style.fontSize = '0.85rem';
+            toast.style.padding = '14px 16px';
+            toast.style.boxShadow = '0 12px 24px rgba(0,0,0,0.12)';
+            toast.style.maxWidth = '380px';
+            toast.style.fontSize = '0.95rem';
             toast.style.color = '#333';
             toast.style.opacity = '0';
             toast.style.transform = 'translateY(8px)';
@@ -907,151 +978,16 @@ Author: @superman2775 +@broodje565
             expiresAt: item.expiresAt || (initialNow + NOTIF_DURATION)
           }));
 
-          const notificationsSection = document.createElement('div');
-          notificationsSection.className = 'achievement-item topnav__menuitem ssa-notifications-panel';
-          notificationsSection.style.display = 'flex';
-          notificationsSection.style.flexDirection = 'column';
-          notificationsSection.style.alignItems = 'flex-start';
-          notificationsSection.style.width = '100%';
-          notificationsSection.style.padding = '10px 14px';
-          notificationsSection.style.boxSizing = 'border-box';
-          notificationsSection.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
-          notificationsSection.style.background = '#fafafa';
-
-          const notificationsHeader = document.createElement('div');
-          notificationsHeader.style.display = 'flex';
-          notificationsHeader.style.alignItems = 'center';
-          notificationsHeader.style.justifyContent = 'space-between';
-          notificationsHeader.style.width = '100%';
-
-          const notificationsTitle = document.createElement('span');
-          notificationsTitle.textContent = 'Notifications';
-          notificationsTitle.style.fontWeight = '600';
-
-          const notificationsActions = document.createElement('div');
-          notificationsActions.style.display = 'flex';
-          notificationsActions.style.gap = '6px';
-
-          const markAllBtn = document.createElement('button');
-          markAllBtn.type = 'button';
-          markAllBtn.textContent = 'Mark read';
-          markAllBtn.style.border = '1px solid #ccc';
-          markAllBtn.style.background = '#fff';
-          markAllBtn.style.borderRadius = '4px';
-          markAllBtn.style.padding = '2px 6px';
-          markAllBtn.style.cursor = 'pointer';
-          markAllBtn.style.fontSize = '0.75rem';
-
-          const clearBtn = document.createElement('button');
-          clearBtn.type = 'button';
-          clearBtn.textContent = 'Clear';
-          clearBtn.style.border = '1px solid #ccc';
-          clearBtn.style.background = '#fff';
-          clearBtn.style.borderRadius = '4px';
-          clearBtn.style.padding = '2px 6px';
-          clearBtn.style.cursor = 'pointer';
-          clearBtn.style.fontSize = '0.75rem';
-
-          notificationsActions.appendChild(markAllBtn);
-          notificationsActions.appendChild(clearBtn);
-          notificationsHeader.appendChild(notificationsTitle);
-          notificationsHeader.appendChild(notificationsActions);
-          notificationsSection.appendChild(notificationsHeader);
-
-          const notificationsList = document.createElement('div');
-          notificationsList.style.marginTop = '8px';
-          notificationsList.style.display = 'flex';
-          notificationsList.style.flexDirection = 'column';
-          notificationsList.style.gap = '6px';
-          notificationsSection.appendChild(notificationsList);
-
-          scrollContainer.appendChild(notificationsSection);
-
           function pruneExpired() {
             const now = Date.now();
             const nextLog = notificationLog.filter(item => !item.expiresAt || item.expiresAt > now);
             if (nextLog.length !== notificationLog.length) {
               notificationLog = nextLog;
-              chrome.storage.local.set({ ssaNotificationLog: notificationLog }, () => {
-                renderNotifications();
-              });
+              chrome.storage.local.set({ ssaNotificationLog: notificationLog });
               return true;
             }
             return false;
           }
-
-          function renderNotifications() {
-            notificationsList.innerHTML = '';
-            pruneExpired();
-
-            if (notificationLog.length === 0) {
-              const empty = document.createElement('div');
-              empty.textContent = 'No notifications yet.';
-              empty.style.fontSize = '0.8rem';
-              empty.style.color = '#666';
-              notificationsList.appendChild(empty);
-              return;
-            }
-
-            notificationLog.forEach((item) => {
-              const row = document.createElement('div');
-              row.className = item.read ? 'ssa-notification-row ssa-notification-read' : 'ssa-notification-row';
-              row.style.border = '1px solid rgba(0,0,0,0.08)';
-              row.style.borderLeft = `3px solid ${typeColor(item.type)}`;
-              row.style.borderRadius = '6px';
-              row.style.padding = '6px 8px';
-              row.style.background = item.read ? '#f7f7f7' : '#ffffff';
-              row.style.cursor = 'pointer';
-
-              const rowTitle = document.createElement('div');
-              rowTitle.textContent = item.title || 'Notification';
-              rowTitle.style.fontWeight = item.read ? '500' : '600';
-              rowTitle.style.fontSize = '0.8rem';
-
-              const rowBody = document.createElement('div');
-              rowBody.textContent = item.body || '';
-              rowBody.style.fontSize = '0.75rem';
-              rowBody.style.color = '#555';
-              rowBody.style.marginTop = '2px';
-
-              const rowTime = document.createElement('div');
-              rowTime.textContent = formatTime(item.ts);
-              rowTime.style.fontSize = '0.7rem';
-              rowTime.style.color = '#888';
-              rowTime.style.marginTop = '2px';
-
-              row.appendChild(rowTitle);
-              row.appendChild(rowBody);
-              row.appendChild(rowTime);
-
-              row.addEventListener('click', () => {
-                if (item.read) return;
-                item.read = true;
-                chrome.storage.local.set({ ssaNotificationLog: notificationLog }, () => {
-                  renderNotifications();
-                });
-              });
-
-              notificationsList.appendChild(row);
-            });
-
-          }
-
-          function saveLog(nextLog) {
-            notificationLog = nextLog;
-            chrome.storage.local.set({ ssaNotificationLog: notificationLog }, () => {
-              renderNotifications();
-            });
-          }
-
-          markAllBtn.addEventListener('click', () => {
-            const updated = notificationLog.map(item => ({ ...item, read: true }));
-            saveLog(updated);
-          });
-
-          clearBtn.addEventListener('click', () => {
-            saveLog([]);
-          });
 
           chrome.storage.local.get(["seenAchievements", "lastLevel"], (old) => {
             const seen = old.seenAchievements || [];
@@ -1069,8 +1005,7 @@ Author: @superman2775 +@broodje565
                 title: 'Achievement unlocked',
                 body: `${a.title} - ${a.desc} (+${a.xp} XP)`,
                 ts: nowIso(),
-                expiresAt: Date.now() + NOTIF_DURATION,
-                read: false
+                expiresAt: Date.now() + NOTIF_DURATION
               });
               seen.push(a.title);
             });
@@ -1082,8 +1017,7 @@ Author: @superman2775 +@broodje565
                 title: 'Level up',
                 body: `You reached level ${level}.`,
                 ts: nowIso(),
-                expiresAt: Date.now() + NOTIF_DURATION,
-                read: false
+                expiresAt: Date.now() + NOTIF_DURATION
               });
             }
 
@@ -1105,13 +1039,10 @@ Author: @superman2775 +@broodje565
                 lastLevel: level
               }, () => {
                 notificationLog = merged;
-                renderNotifications();
                 setTimeout(() => {
                   pruneExpired();
                 }, NOTIF_DURATION + 300);
               });
-            } else {
-              renderNotifications();
             }
           });
         })();

@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Smartschool Achievements Leaderboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f3efe6;
+        --bg-accent: #e4f2ff;
+        --ink: #1b1b1b;
+        --muted: #57606a;
+        --card: #ffffff;
+        --accent: #f57c00;
+        --accent-2: #00897b;
+        --shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: var(--ink);
+        background: radial-gradient(circle at 10% 20%, var(--bg-accent), transparent 55%),
+          radial-gradient(circle at 85% 10%, #ffe9d1, transparent 50%),
+          var(--bg);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 20px;
+      }
+
+      .shell {
+        width: min(960px, 100%);
+        display: grid;
+        gap: 28px;
+      }
+
+      header {
+        display: grid;
+        gap: 10px;
+      }
+
+      h1 {
+        font-size: clamp(2.1rem, 3vw, 3rem);
+        margin: 0;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 60ch;
+      }
+
+      .board {
+        background: var(--card);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 26px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .board-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .board-header .meta {
+        font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .leaderboard {
+        display: grid;
+        gap: 12px;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 54px 1fr auto;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: #f7f6f2;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        transition: transform 180ms ease, box-shadow 180ms ease;
+      }
+
+      .row:nth-child(odd) {
+        background: #f0f7f5;
+      }
+
+      .row:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .rank {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: var(--accent);
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+      }
+
+      .name {
+        font-weight: 600;
+        font-size: 1.05rem;
+      }
+
+      .level {
+        font-weight: 700;
+        color: var(--accent-2);
+        font-size: 1.1rem;
+      }
+
+      .status {
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #fff3e0;
+        color: #b45309;
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+
+      @media (max-width: 720px) {
+        .row {
+          grid-template-columns: 42px 1fr;
+          gap: 10px;
+        }
+
+        .level {
+          grid-column: 1 / -1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <span class="pill">Live from Smartschool Achievements</span>
+        <h1>Leaderboard</h1>
+        <p>Levels sync from the extension to Supabase. Names are randomized per user and stored once so the board stays consistent.</p>
+      </header>
+
+      <section class="board">
+        <div class="board-header">
+          <div>
+            <strong>Top learners</strong>
+          </div>
+          <div class="meta" id="last-updated">Waiting for data...</div>
+        </div>
+        <div id="status" class="status">Loading leaderboard...</div>
+        <div class="leaderboard" id="leaderboard"></div>
+      </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const SUPABASE_URL = 'https://gyyijtmbnnfjnywajbcg.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eWlqdG1ibm5mam55d2FqYmNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjkxMzUsImV4cCI6MjA4OTAwNTEzNX0.FRs1eH7rAZ_EW2dyHtpKfKKsoe5nHQHvSUmZv5TeJCE';
+      const LEADERBOARD_TABLE = 'leaderboard';
+      const MAX_ROWS = 20;
+
+      const fallbackParts = {
+        adj: ['Brisk', 'Quiet', 'Solar', 'Nova', 'Iron', 'Swift', 'Wild', 'Lunar', 'Sharp', 'Bold'],
+        noun: ['Falcon', 'Comet', 'River', 'Pine', 'Echo', 'Orbit', 'Signal', 'Harbor', 'Glade', 'Forge']
+      };
+
+      const leaderboardEl = document.getElementById('leaderboard');
+      const statusEl = document.getElementById('status');
+      const updatedEl = document.getElementById('last-updated');
+
+      const isConfigured = () =>
+        SUPABASE_URL &&
+        SUPABASE_ANON_KEY &&
+        !SUPABASE_URL.includes('YOUR_') &&
+        !SUPABASE_ANON_KEY.includes('YOUR_');
+
+      const randomName = () => {
+        const adj = fallbackParts.adj[Math.floor(Math.random() * fallbackParts.adj.length)];
+        const noun = fallbackParts.noun[Math.floor(Math.random() * fallbackParts.noun.length)];
+        const suffix = Math.floor(10 + Math.random() * 90);
+        return `${adj}${noun}${suffix}`;
+      };
+
+      const render = (rows) => {
+        leaderboardEl.innerHTML = '';
+        rows.forEach((row, index) => {
+          const item = document.createElement('div');
+          item.className = 'row';
+
+          const rank = document.createElement('div');
+          rank.className = 'rank';
+          rank.textContent = index + 1;
+
+          const name = document.createElement('div');
+          name.className = 'name';
+          name.textContent = row.name;
+
+          const level = document.createElement('div');
+          level.className = 'level';
+          level.textContent = `Level ${row.level}`;
+
+          item.appendChild(rank);
+          item.appendChild(name);
+          item.appendChild(level);
+          leaderboardEl.appendChild(item);
+        });
+      };
+
+      const renderFallback = () => {
+        const rows = Array.from({ length: 10 }, () => ({
+          name: randomName(),
+          level: Math.floor(1 + Math.random() * 25)
+        })).sort((a, b) => b.level - a.level);
+
+        statusEl.textContent = 'Supabase not configured yet. Showing demo data.';
+        render(rows);
+        updatedEl.textContent = 'Demo mode';
+      };
+
+      const loadLeaderboard = async () => {
+        if (!isConfigured()) {
+          renderFallback();
+          return;
+        }
+
+        statusEl.textContent = 'Syncing with Supabase...';
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const { data, error } = await client
+          .from(LEADERBOARD_TABLE)
+          .select('name, level, updated_at')
+          .order('level', { ascending: false })
+          .limit(MAX_ROWS);
+
+        if (error) {
+          statusEl.textContent = 'Could not load the leaderboard.';
+          updatedEl.textContent = 'Check your Supabase credentials.';
+          return;
+        }
+
+        statusEl.textContent = data.length ? '' : 'No entries yet.';
+        render(data);
+        const latest = data[0]?.updated_at;
+        updatedEl.textContent = latest ? `Last update: ${new Date(latest).toLocaleString()}` : 'Waiting for updates...';
+      };
+
+      loadLeaderboard();
+    </script>
+  </body>
+</html>

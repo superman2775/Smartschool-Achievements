@@ -11,7 +11,8 @@
     "webRequest"
   ],
   "host_permissions": [
-    "https://*.smartschool.be/*"
+    "https://*.smartschool.be/*",
+    "https://gyyijtmbnnfjnywajbcg.supabase.co/*"
   ],
   "content_scripts": [
     {
