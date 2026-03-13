@@ -643,12 +643,14 @@ Author: @superman2775 +@broodje565
         const validCodes = {
           "WHOPPER": 100,
           "TEAMSMARTSCHOOLACHIEVEMENTS1000": 1000,
-          "HAPPYNEWYEAR2026": 500,
+          "HAPPYNEWYEAR2027": 500,
           "SUMMERVIBES2026": 250,
           "BACK2SCHOOL2026": 250,
           "LUCKYUSER1000": 1000,
+          "LUCKYUSER500": 500,
           "JOINTHEDISCORDANDGETACHIEVEMENT": 0,
-          "YOUKNOWITLEARN?": 100,
+          "ITLEARNISAMAZING": 1000,
+          "SMARTSCHOOLISLIFE": 100
         };
 
         let redeemed = res.redeemedCodes || [];
@@ -737,7 +739,43 @@ Author: @superman2775 +@broodje565
             return '#43a047';
           }
 
+          function ensureNotificationStyles() {
+            if (document.getElementById('ssa-achievements-notification-styles')) return;
+
+            const style = document.createElement('style');
+            style.id = 'ssa-achievements-notification-styles';
+            style.textContent = `
+#ssa-achievements-notifications .ssa-toast {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+.ssa-notifications-panel {
+  background: #fafafa !important;
+  background-color: #fafafa !important;
+}
+.ssa-notification-row {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+.ssa-notification-row.ssa-notification-read {
+  background: #f7f7f7 !important;
+  background-color: #f7f7f7 !important;
+}
+`;
+            const styleRoot = document.head || document.documentElement;
+            if (styleRoot) {
+              styleRoot.appendChild(style);
+            } else {
+              document.addEventListener('DOMContentLoaded', () => {
+                if (!document.getElementById('ssa-achievements-notification-styles')) {
+                  (document.head || document.documentElement).appendChild(style);
+                }
+              }, { once: true });
+            }
+          }
+
           function ensureContainer() {
+            ensureNotificationStyles();
             let container = document.getElementById('ssa-achievements-notifications');
             if (container) return container;
 
@@ -776,6 +814,7 @@ Author: @superman2775 +@broodje565
 
           function buildToast(data) {
             const toast = document.createElement('div');
+            toast.className = 'ssa-toast';
             toast.style.background = '#ffffff';
             toast.style.border = '1px solid rgba(0,0,0,0.08)';
             toast.style.borderLeft = `4px solid ${typeColor(data.type)}`;
@@ -865,7 +904,7 @@ Author: @superman2775 +@broodje565
           }));
 
           const notificationsSection = document.createElement('div');
-          notificationsSection.className = 'achievement-item topnav__menuitem';
+          notificationsSection.className = 'achievement-item topnav__menuitem ssa-notifications-panel';
           notificationsSection.style.display = 'flex';
           notificationsSection.style.flexDirection = 'column';
           notificationsSection.style.alignItems = 'flex-start';
@@ -952,6 +991,7 @@ Author: @superman2775 +@broodje565
 
             notificationLog.forEach((item) => {
               const row = document.createElement('div');
+              row.className = item.read ? 'ssa-notification-row ssa-notification-read' : 'ssa-notification-row';
               row.style.border = '1px solid rgba(0,0,0,0.08)';
               row.style.borderLeft = `3px solid ${typeColor(item.type)}`;
               row.style.borderRadius = '6px';
