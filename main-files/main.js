@@ -119,16 +119,34 @@ Author: @superman2775 +@broodje565
 
       const header = document.createElement('div');
       header.className = 'topnav__menu__hdr';
-      header.innerHTML = `<h2 class="topnav__menu__title" style="margin-left:10px;">Achievements</h2>`;
       header.style.flex = '0 0 auto';
-      header.style.display = 'flex';
-      header.style.alignItems = 'center';
-      header.style.justifyContent = 'space-between';
+      header.style.setProperty('display', 'block', 'important');
+
+      const titleRow = document.createElement('div');
+      titleRow.style.display = 'flex';
+      titleRow.style.alignItems = 'center';
+      titleRow.style.justifyContent = 'space-between';
+      titleRow.style.gap = '8px';
+      titleRow.style.flexWrap = 'nowrap';
+      titleRow.style.marginBottom = '12px';
+
+      const titleEl = document.createElement('h2');
+      titleEl.className = 'topnav__menu__title';
+      titleEl.textContent = 'Achievements';
+      titleEl.style.margin = '0';
+      titleEl.style.display = 'inline-flex';
+      titleEl.style.alignItems = 'center';
+      titleEl.style.flex = '0 0 auto';
+      titleEl.style.whiteSpace = 'nowrap';
 
       const leaderboardBtn = document.createElement('button');
       leaderboardBtn.type = 'button';
       leaderboardBtn.textContent = 'Leaderboard';
-      leaderboardBtn.style.marginRight = '10px';
+      leaderboardBtn.style.marginLeft = '0';
+      leaderboardBtn.style.marginRight = '0';
+      leaderboardBtn.style.display = 'inline-flex';
+      leaderboardBtn.style.alignItems = 'center';
+      leaderboardBtn.style.flex = '0 0 auto';
       leaderboardBtn.style.padding = '4px 10px';
       leaderboardBtn.style.borderRadius = '6px';
       leaderboardBtn.style.border = '1px solid #ccc';
@@ -137,7 +155,9 @@ Author: @superman2775 +@broodje565
       leaderboardBtn.style.fontSize = '0.8rem';
       leaderboardBtn.style.fontWeight = '600';
       leaderboardBtn.style.color = '#333';
-      header.appendChild(leaderboardBtn);
+      titleRow.appendChild(titleEl);
+      titleRow.appendChild(leaderboardBtn);
+      header.appendChild(titleRow);
       menu.appendChild(header);
 
       let leaderboardOverlay = null;
