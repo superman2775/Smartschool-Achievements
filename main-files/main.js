@@ -11,6 +11,7 @@ Author: @superman2775 +@broodje565
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eWlqdG1ibm5mam55d2FqYmNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjkxMzUsImV4cCI6MjA4OTAwNTEzNX0.FRs1eH7rAZ_EW2dyHtpKfKKsoe5nHQHvSUmZv5TeJCE';
   const LEADERBOARD_TABLE = 'leaderboard';
   const LEADERBOARD_SYNC_MS = 6 * 60 * 60 * 1000;
+  const LEADERBOARD_URL = 'https://superman2775.github.io/Smartschool-Achievements/website/';
 
   const LEADERBOARD_NAME_PARTS = {
     adj: ['Brisk', 'Quiet', 'Solar', 'Nova', 'Iron', 'Swift', 'Wild', 'Lunar', 'Sharp', 'Bold', 'Bright', 'Silent', 'Mighty', 'Clever', 'Fierce', 'Noble', 'Sly', 'Vivid', 'Daring', 'Stealthy'],
@@ -30,19 +31,19 @@ Author: @superman2775 +@broodje565
     return SUPABASE_URL.startsWith('https://');
   }
 
-  function syncLeaderboardLevel(level) {
+  function syncLeaderboardScore(xp, level) {
     if (!isSupabaseConfigured()) return;
-    if (!Number.isFinite(level)) return;
+    if (!Number.isFinite(xp)) return;
 
     chrome.storage.local.get([
       'ssaLeaderboardClientId',
       'ssaLeaderboardName',
       'ssaLeaderboardLastSync',
-      'ssaLeaderboardLastLevel'
+      'ssaLeaderboardLastXp'
     ], (res) => {
       const lastSync = res.ssaLeaderboardLastSync || 0;
-      const lastLevel = typeof res.ssaLeaderboardLastLevel === 'number' ? res.ssaLeaderboardLastLevel : -1;
-      const shouldSync = (level !== lastLevel) || (Date.now() - lastSync > LEADERBOARD_SYNC_MS);
+      const lastXp = typeof res.ssaLeaderboardLastXp === 'number' ? res.ssaLeaderboardLastXp : -1;
+      const shouldSync = (xp !== lastXp) || (Date.now() - lastSync > LEADERBOARD_SYNC_MS);
       if (!shouldSync) return;
 
       const clientId = res.ssaLeaderboardClientId
@@ -63,6 +64,7 @@ Author: @superman2775 +@broodje565
         body: JSON.stringify({
           client_id: clientId,
           name,
+          xp,
           level,
           updated_at: new Date().toISOString()
         })
@@ -72,7 +74,7 @@ Author: @superman2775 +@broodje565
           ssaLeaderboardClientId: clientId,
           ssaLeaderboardName: name,
           ssaLeaderboardLastSync: Date.now(),
-          ssaLeaderboardLastLevel: level
+          ssaLeaderboardLastXp: xp
         });
       }).catch((err) => {
         console.warn('[Achievements] Leaderboard sync failed', err);
@@ -119,7 +121,94 @@ Author: @superman2775 +@broodje565
       header.className = 'topnav__menu__hdr';
       header.innerHTML = `<h2 class="topnav__menu__title" style="margin-left:10px;">Achievements</h2>`;
       header.style.flex = '0 0 auto';
+      header.style.display = 'flex';
+      header.style.alignItems = 'center';
+      header.style.justifyContent = 'space-between';
+
+      const leaderboardBtn = document.createElement('button');
+      leaderboardBtn.type = 'button';
+      leaderboardBtn.textContent = 'Leaderboard';
+      leaderboardBtn.style.marginRight = '10px';
+      leaderboardBtn.style.padding = '4px 10px';
+      leaderboardBtn.style.borderRadius = '6px';
+      leaderboardBtn.style.border = '1px solid #ccc';
+      leaderboardBtn.style.background = '#fff';
+      leaderboardBtn.style.cursor = 'pointer';
+      leaderboardBtn.style.fontSize = '0.8rem';
+      leaderboardBtn.style.fontWeight = '600';
+      leaderboardBtn.style.color = '#333';
+      header.appendChild(leaderboardBtn);
       menu.appendChild(header);
+
+      let leaderboardOverlay = null;
+
+      function openLeaderboardPopup() {
+        const root = document.body || document.documentElement;
+        if (!root) return;
+
+        if (!leaderboardOverlay) {
+          leaderboardOverlay = document.createElement('div');
+          leaderboardOverlay.id = 'ssa-leaderboard-overlay';
+          leaderboardOverlay.style.position = 'fixed';
+          leaderboardOverlay.style.inset = '0';
+          leaderboardOverlay.style.background = 'rgba(0, 0, 0, 0.45)';
+          leaderboardOverlay.style.zIndex = '2147483647';
+          leaderboardOverlay.style.display = 'flex';
+          leaderboardOverlay.style.alignItems = 'center';
+          leaderboardOverlay.style.justifyContent = 'center';
+          leaderboardOverlay.style.padding = '20px';
+
+          const panel = document.createElement('div');
+          panel.style.width = 'min(960px, 100%)';
+          panel.style.height = 'min(80vh, 720px)';
+          panel.style.background = '#fff';
+          panel.style.borderRadius = '12px';
+          panel.style.boxShadow = '0 18px 40px rgba(0,0,0,0.2)';
+          panel.style.position = 'relative';
+          panel.style.overflow = 'hidden';
+
+          const closeBtn = document.createElement('button');
+          closeBtn.type = 'button';
+          closeBtn.textContent = 'Close';
+          closeBtn.style.position = 'absolute';
+          closeBtn.style.top = '12px';
+          closeBtn.style.right = '12px';
+          closeBtn.style.zIndex = '2';
+          closeBtn.style.padding = '6px 10px';
+          closeBtn.style.borderRadius = '6px';
+          closeBtn.style.border = '1px solid #ccc';
+          closeBtn.style.background = '#fff';
+          closeBtn.style.cursor = 'pointer';
+          closeBtn.style.fontWeight = '600';
+
+          const iframe = document.createElement('iframe');
+          iframe.src = LEADERBOARD_URL;
+          iframe.title = 'Leaderboard';
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+          iframe.style.border = 'none';
+
+          closeBtn.addEventListener('click', () => {
+            leaderboardOverlay.remove();
+            leaderboardOverlay = null;
+          });
+
+          leaderboardOverlay.addEventListener('click', (event) => {
+            if (event.target === leaderboardOverlay) {
+              leaderboardOverlay.remove();
+              leaderboardOverlay = null;
+            }
+          });
+
+          panel.appendChild(closeBtn);
+          panel.appendChild(iframe);
+          leaderboardOverlay.appendChild(panel);
+        }
+
+        root.appendChild(leaderboardOverlay);
+      }
+
+      leaderboardBtn.addEventListener('click', openLeaderboardPopup);
 
       // === XP + Level sectie ===
       const xpContainer = document.createElement('div');
@@ -573,7 +662,7 @@ Author: @superman2775 +@broodje565
         const progressPercent = (xpLeft / xpNeededForNextLevel) * 100;
         levelDisplay.textContent = `🧠 Level ${level} (${xpLeft} / ${xpNeededForNextLevel} XP naar level ${level + 1})`;
         levelBar.style.width = `${progressPercent}%`;
-        syncLeaderboardLevel(level);
+        syncLeaderboardScore(totalXP, level);
 
         // === ACHIEVEMENTS MAKEN ===
         achievements.forEach(a => {

@@ -168,7 +168,7 @@
       <header>
         <span class="pill">Live from Smartschool Achievements</span>
         <h1>Leaderboard</h1>
-        <p>Levels sync from the extension to Supabase. Names are randomized per user and stored once so the board stays consistent.</p>
+        <p>XP syncs from the extension to Supabase. Names are randomized per user and stored once so the board stays consistent.</p>
       </header>
 
       <section class="board">
@@ -228,7 +228,8 @@
 
           const level = document.createElement('div');
           level.className = 'level';
-          level.textContent = `Level ${row.level}`;
+          const xpValue = typeof row.xp === 'number' ? row.xp : 0;
+          level.textContent = `XP ${xpValue}`;
 
           item.appendChild(rank);
           item.appendChild(name);
@@ -240,8 +241,8 @@
       const renderFallback = () => {
         const rows = Array.from({ length: 10 }, () => ({
           name: randomName(),
-          level: Math.floor(1 + Math.random() * 25)
-        })).sort((a, b) => b.level - a.level);
+          xp: Math.floor(100 + Math.random() * 5000)
+        })).sort((a, b) => b.xp - a.xp);
 
         statusEl.textContent = 'Supabase not configured yet. Showing demo data.';
         render(rows);
@@ -258,8 +259,8 @@
         const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const { data, error } = await client
           .from(LEADERBOARD_TABLE)
-          .select('name, level, updated_at')
-          .order('level', { ascending: false })
+          .select('name, xp, updated_at')
+          .order('xp', { ascending: false })
           .limit(MAX_ROWS);
 
         if (error) {
