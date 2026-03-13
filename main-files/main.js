@@ -8,8 +8,8 @@ Author: @superman2775 +@broodje565
   'use strict';
 
   const waitForNav = setInterval(() => {
-    const linksBtnWrapper = document.querySelector('[data-links]');
-    const messagesBtn = document.querySelector('.js-btn-messages');
+    const linksBtnWrapper = document.querySelector('[data-courses]');
+    const messagesBtn = document.querySelector('[data-links]');
     const shortcutsMenu = document.getElementById('shortcutsMenu');
 
     if (linksBtnWrapper && messagesBtn && shortcutsMenu) {
@@ -23,6 +23,7 @@ Author: @superman2775 +@broodje565
       button.innerHTML = 'Achievements';
       button.setAttribute('aria-haspopup', 'true');
       button.setAttribute('aria-expanded', 'false');
+      button.style.position = 'relative';
 
       const menuWrapper = document.createElement('div');
       menuWrapper.id = 'achievementsMenu';
@@ -115,7 +116,8 @@ Author: @superman2775 +@broodje565
         "highestStreak", 
         "redeemedCodes", 
         "bonusXP", 
-        "joinedDiscord"], (res) => {
+        "joinedDiscord",
+        "ssaNotificationLog"], (res) => {
 
         const buizen = res.buizenCount || 0;
         const hundredPercent = res.hundredPercentCount || 0;
@@ -714,134 +716,361 @@ Author: @superman2775 +@broodje565
         wrapper.appendChild(button);
         wrapper.appendChild(menuWrapper);
 
-        // === AUTOMATISCHE MELDINGEN BIJ NIEUWE ACHIEVEMENTS / LEVEL-UP ===
-(function () {
-  function findSessionKey() {
-    const reHex32 = /^[0-9a-f]{32}$/i;
-    const suffixBlacklist = ["MessagesCounter", "queueUuid"];
+        // === SSA NOTIFICATION SYSTEM (LOCAL) ===
+        (function () {
+          const NOTIF_DURATION = 5000;
+          const NOTIF_GAP = 10;
+          const MAX_LOG = 50;
 
-    let keys = [];
+          function createId() {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+            return Math.random().toString(36).slice(2) + Date.now().toString(36);
+          }
 
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const rawKey = sessionStorage.key(i);
-      if (!rawKey) continue;
+          function nowIso() {
+            return new Date().toISOString();
+          }
 
-      let key = rawKey;
+          function typeColor(type) {
+            if (type === 'level') return '#29b6f6';
+            if (type === 'info') return '#6d4c41';
+            return '#43a047';
+          }
 
-      // strip suffixes zoals "...MessagesCounter"
-      for (const suffix of suffixBlacklist) {
-        if (rawKey.endsWith(suffix)) {
-          key = rawKey.slice(0, -suffix.length);
-        }
-      }
+          function ensureContainer() {
+            let container = document.getElementById('ssa-achievements-notifications');
+            if (container) return container;
 
-      // alleen pure hex keys toelaten
-      if (!reHex32.test(key)) continue;
+            container = document.createElement('div');
+            container.id = 'ssa-achievements-notifications';
+            container.style.position = 'fixed';
+            container.style.right = '16px';
+            container.style.bottom = '16px';
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.gap = `${NOTIF_GAP}px`;
+            container.style.zIndex = '2147483647';
+            container.style.pointerEvents = 'none';
 
-      keys.push(key);
-    }
+            const root = document.body || document.documentElement;
+            if (!root) {
+              const attachLater = () => {
+                const lateRoot = document.body || document.documentElement;
+                if (lateRoot && !document.getElementById('ssa-achievements-notifications')) {
+                  lateRoot.appendChild(container);
+                }
+              };
 
-    // duplicates weg
-    keys = [...new Set(keys)];
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', attachLater, { once: true });
+              } else {
+                setTimeout(attachLater, 0);
+              }
 
-    // Meldingen arrays detecteren
-    for (const key of keys) {
-      try {
-        const val = sessionStorage.getItem(key);
-        if (!val) continue;
+              return container;
+            }
 
-        const parsed = JSON.parse(val);
-        if (Array.isArray(parsed)) {
-          return key; // correcte key gevonden
-        }
-      } catch {}
-    }
+            root.appendChild(container);
+            return container;
+          }
 
-    return null;
-  }
+          function buildToast(data) {
+            const toast = document.createElement('div');
+            toast.style.background = '#ffffff';
+            toast.style.border = '1px solid rgba(0,0,0,0.08)';
+            toast.style.borderLeft = `4px solid ${typeColor(data.type)}`;
+            toast.style.borderRadius = '8px';
+            toast.style.padding = '10px 12px';
+            toast.style.boxShadow = '0 10px 20px rgba(0,0,0,0.08)';
+            toast.style.maxWidth = '320px';
+            toast.style.fontSize = '0.85rem';
+            toast.style.color = '#333';
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(8px)';
+            toast.style.transition = 'opacity 180ms ease, transform 180ms ease';
+            toast.style.pointerEvents = 'auto';
 
-  const key = findSessionKey();
-  if (!key) {
-    console.warn("[Achievements] ❌ Geen session key gevonden voor meldingen.");
-    return;
-  }
+            const header = document.createElement('div');
+            header.style.display = 'flex';
+            header.style.alignItems = 'center';
+            header.style.justifyContent = 'space-between';
+            header.style.gap = '8px';
 
-  // Lees vorige status
-  chrome.storage.local.get(["seenAchievements", "lastLevel"], (old) => {
-    const seen = old.seenAchievements || [];
-    const lastLevel = old.lastLevel || 0;
+            const title = document.createElement('div');
+            title.textContent = data.title;
+            title.style.fontWeight = '600';
+            title.style.display = 'flex';
+            title.style.alignItems = 'center';
+            title.style.gap = '6px';
 
-    // Nieuwe achievements
-    const newlyCompleted = achievements.filter(a => a.progress >= 100 && !seen.includes(a.title));
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.textContent = 'x';
+            closeBtn.style.background = 'transparent';
+            closeBtn.style.border = 'none';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.style.fontSize = '1rem';
+            closeBtn.style.lineHeight = '1';
+            closeBtn.style.color = '#777';
 
-    const now = new Date().toISOString();
-    const notifications = [];
+            header.appendChild(title);
+            header.appendChild(closeBtn);
+            toast.appendChild(header);
 
-    // Achievement meldingen
-    newlyCompleted.forEach(a => {
-      notifications.push({
-        ssid: 2237,
-        userid: 8772,
-        userlt: 0,
-        created: now,
-        hash: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
-        metadata: JSON.stringify({
-          icon: "results",
-          iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement-500x500.png?raw=true",
-          title: "🏆 Nieuw achievement behaald!",
-          description: `${a.title} – ${a.desc} (+${a.xp} XP)`,
-          date: new Date().toLocaleString(),
-          url: "/",
-          urlTarget: "_self"
-        }),
-        unread: true
-      });
-      seen.push(a.title);
-    });
+            const body = document.createElement('div');
+            body.textContent = data.body;
+            body.style.marginTop = '4px';
+            body.style.color = '#555';
+            toast.appendChild(body);
 
-    // Level-up melding
-    if (level > lastLevel) {
-      notifications.push({
-        ssid: 2237,
-        userid: 8772,
-        userlt: 0,
-        created: now,
-        hash: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
-        metadata: JSON.stringify({
-          icon: "results",
-          iconUrl: "https://github.com/superman2775/smartschool-achievements-logo/blob/main/smartschool-achievement-500x500.png?raw=true",
-          title: "🧠 Level Up!",
-          description: `Je hebt level ${level} bereikt!`,
-          date: new Date().toLocaleString(),
-          url: "/",
-          urlTarget: "_self"
-        }),
-        unread: true
-      });
-    }
+            closeBtn.addEventListener('click', () => {
+              toast.remove();
+            });
 
-    // Niets om te melden → stop
-    if (notifications.length === 0) return;
+            const showToast = () => {
+              toast.style.opacity = '1';
+              toast.style.transform = 'translateY(0)';
+            };
 
-    // Opslaan in sessionStorage
-    try {
-      const existing = JSON.parse(sessionStorage.getItem(key) || "[]");
-      const merged = existing.concat(notifications);
+            if (typeof requestAnimationFrame === 'function') {
+              requestAnimationFrame(showToast);
+            } else {
+              setTimeout(showToast, 0);
+            }
 
-      sessionStorage.setItem(key, JSON.stringify(merged));
+            setTimeout(() => {
+              toast.style.opacity = '0';
+              toast.style.transform = 'translateY(8px)';
+              setTimeout(() => toast.remove(), 200);
+            }, NOTIF_DURATION);
 
-      console.log(`[Achievements] ✅ ${notifications.length} melding(en) toegevoegd onder key ${key}`);
+            return toast;
+          }
 
-      // Smartschool UI refresh
-      location.reload();
-    } catch (err) {
-      console.error("[Achievements] Fout bij opslaan notificaties:", err);
-    }
+          function formatTime(iso) {
+            try {
+              const date = new Date(iso);
+              if (Number.isNaN(date.getTime())) return '';
+              return date.toLocaleString();
+            } catch {
+              return '';
+            }
+          }
 
-    // Nieuwe status opslaan
-    chrome.storage.local.set({ seenAchievements: seen, lastLevel: level });
-  });
-})();
+          let notificationLog = Array.isArray(res.ssaNotificationLog) ? res.ssaNotificationLog : [];
+          const initialNow = Date.now();
+          notificationLog = notificationLog.map(item => ({
+            ...item,
+            expiresAt: item.expiresAt || (initialNow + NOTIF_DURATION)
+          }));
+
+          const notificationsSection = document.createElement('div');
+          notificationsSection.className = 'achievement-item topnav__menuitem';
+          notificationsSection.style.display = 'flex';
+          notificationsSection.style.flexDirection = 'column';
+          notificationsSection.style.alignItems = 'flex-start';
+          notificationsSection.style.width = '100%';
+          notificationsSection.style.padding = '10px 14px';
+          notificationsSection.style.boxSizing = 'border-box';
+          notificationsSection.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
+          notificationsSection.style.background = '#fafafa';
+
+          const notificationsHeader = document.createElement('div');
+          notificationsHeader.style.display = 'flex';
+          notificationsHeader.style.alignItems = 'center';
+          notificationsHeader.style.justifyContent = 'space-between';
+          notificationsHeader.style.width = '100%';
+
+          const notificationsTitle = document.createElement('span');
+          notificationsTitle.textContent = 'Notifications';
+          notificationsTitle.style.fontWeight = '600';
+
+          const notificationsActions = document.createElement('div');
+          notificationsActions.style.display = 'flex';
+          notificationsActions.style.gap = '6px';
+
+          const markAllBtn = document.createElement('button');
+          markAllBtn.type = 'button';
+          markAllBtn.textContent = 'Mark read';
+          markAllBtn.style.border = '1px solid #ccc';
+          markAllBtn.style.background = '#fff';
+          markAllBtn.style.borderRadius = '4px';
+          markAllBtn.style.padding = '2px 6px';
+          markAllBtn.style.cursor = 'pointer';
+          markAllBtn.style.fontSize = '0.75rem';
+
+          const clearBtn = document.createElement('button');
+          clearBtn.type = 'button';
+          clearBtn.textContent = 'Clear';
+          clearBtn.style.border = '1px solid #ccc';
+          clearBtn.style.background = '#fff';
+          clearBtn.style.borderRadius = '4px';
+          clearBtn.style.padding = '2px 6px';
+          clearBtn.style.cursor = 'pointer';
+          clearBtn.style.fontSize = '0.75rem';
+
+          notificationsActions.appendChild(markAllBtn);
+          notificationsActions.appendChild(clearBtn);
+          notificationsHeader.appendChild(notificationsTitle);
+          notificationsHeader.appendChild(notificationsActions);
+          notificationsSection.appendChild(notificationsHeader);
+
+          const notificationsList = document.createElement('div');
+          notificationsList.style.marginTop = '8px';
+          notificationsList.style.display = 'flex';
+          notificationsList.style.flexDirection = 'column';
+          notificationsList.style.gap = '6px';
+          notificationsSection.appendChild(notificationsList);
+
+          scrollContainer.appendChild(notificationsSection);
+
+          function pruneExpired() {
+            const now = Date.now();
+            const nextLog = notificationLog.filter(item => !item.expiresAt || item.expiresAt > now);
+            if (nextLog.length !== notificationLog.length) {
+              notificationLog = nextLog;
+              chrome.storage.local.set({ ssaNotificationLog: notificationLog }, () => {
+                renderNotifications();
+              });
+              return true;
+            }
+            return false;
+          }
+
+          function renderNotifications() {
+            notificationsList.innerHTML = '';
+            pruneExpired();
+
+            if (notificationLog.length === 0) {
+              const empty = document.createElement('div');
+              empty.textContent = 'No notifications yet.';
+              empty.style.fontSize = '0.8rem';
+              empty.style.color = '#666';
+              notificationsList.appendChild(empty);
+              return;
+            }
+
+            notificationLog.forEach((item) => {
+              const row = document.createElement('div');
+              row.style.border = '1px solid rgba(0,0,0,0.08)';
+              row.style.borderLeft = `3px solid ${typeColor(item.type)}`;
+              row.style.borderRadius = '6px';
+              row.style.padding = '6px 8px';
+              row.style.background = item.read ? '#f7f7f7' : '#ffffff';
+              row.style.cursor = 'pointer';
+
+              const rowTitle = document.createElement('div');
+              rowTitle.textContent = item.title || 'Notification';
+              rowTitle.style.fontWeight = item.read ? '500' : '600';
+              rowTitle.style.fontSize = '0.8rem';
+
+              const rowBody = document.createElement('div');
+              rowBody.textContent = item.body || '';
+              rowBody.style.fontSize = '0.75rem';
+              rowBody.style.color = '#555';
+              rowBody.style.marginTop = '2px';
+
+              const rowTime = document.createElement('div');
+              rowTime.textContent = formatTime(item.ts);
+              rowTime.style.fontSize = '0.7rem';
+              rowTime.style.color = '#888';
+              rowTime.style.marginTop = '2px';
+
+              row.appendChild(rowTitle);
+              row.appendChild(rowBody);
+              row.appendChild(rowTime);
+
+              row.addEventListener('click', () => {
+                if (item.read) return;
+                item.read = true;
+                chrome.storage.local.set({ ssaNotificationLog: notificationLog }, () => {
+                  renderNotifications();
+                });
+              });
+
+              notificationsList.appendChild(row);
+            });
+
+          }
+
+          function saveLog(nextLog) {
+            notificationLog = nextLog;
+            chrome.storage.local.set({ ssaNotificationLog: notificationLog }, () => {
+              renderNotifications();
+            });
+          }
+
+          markAllBtn.addEventListener('click', () => {
+            const updated = notificationLog.map(item => ({ ...item, read: true }));
+            saveLog(updated);
+          });
+
+          clearBtn.addEventListener('click', () => {
+            saveLog([]);
+          });
+
+          chrome.storage.local.get(["seenAchievements", "lastLevel"], (old) => {
+            const seen = old.seenAchievements || [];
+            const lastLevel = old.lastLevel || 0;
+
+            const newlyCompleted = achievements.filter(a => a.progress >= 100 && !seen.includes(a.title));
+            const hasLevelUp = level > lastLevel;
+
+            const generated = [];
+
+            newlyCompleted.forEach(a => {
+              generated.push({
+                id: createId(),
+                type: 'achievement',
+                title: 'Achievement unlocked',
+                body: `${a.title} - ${a.desc} (+${a.xp} XP)`,
+                ts: nowIso(),
+                expiresAt: Date.now() + NOTIF_DURATION,
+                read: false
+              });
+              seen.push(a.title);
+            });
+
+            if (hasLevelUp) {
+              generated.push({
+                id: createId(),
+                type: 'level',
+                title: 'Level up',
+                body: `You reached level ${level}.`,
+                ts: nowIso(),
+                expiresAt: Date.now() + NOTIF_DURATION,
+                read: false
+              });
+            }
+
+            if (generated.length > 0) {
+              const container = ensureContainer();
+              generated.forEach((item) => {
+                const toast = buildToast({
+                  type: item.type,
+                  title: item.title,
+                  body: item.body
+                });
+                container.appendChild(toast);
+              });
+
+              const merged = generated.concat(notificationLog).slice(0, MAX_LOG);
+              chrome.storage.local.set({
+                ssaNotificationLog: merged,
+                seenAchievements: seen,
+                lastLevel: level
+              }, () => {
+                notificationLog = merged;
+                renderNotifications();
+                setTimeout(() => {
+                  pruneExpired();
+                }, NOTIF_DURATION + 300);
+              });
+            } else {
+              renderNotifications();
+            }
+          });
+        })();
 
       });
     }
