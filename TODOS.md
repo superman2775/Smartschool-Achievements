@@ -1,2 +1,1 @@
-- Leaderboards (lots of people can cheat)
 - Shit van dezelfde categorie inklapbaar maken want dit is echt chaos
