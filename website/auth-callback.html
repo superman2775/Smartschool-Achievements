@@ -38,7 +38,7 @@
   <body>
     <div class="card">
       <h1>Finishing sign-in...</h1>
-      <p>You can close this tab once it completes.</p>
+      <p>This tab will close automatically when finished.</p>
       <p id="status"></p>
     </div>
 
@@ -72,7 +72,7 @@
           }, window.location.origin);
         }
 
-        statusEl.textContent = 'Signed in successfully. You can return to the leaderboard.';
+        statusEl.textContent = 'Signed in successfully. If the tab does not close automatically, please close it manually.';
         setTimeout(() => {
           window.close();
         }, 500);
