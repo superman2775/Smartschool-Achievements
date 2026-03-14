@@ -14,9 +14,19 @@ Author: @superman2775 +@broodje565
   const LEADERBOARD_URL = 'https://superman2775.github.io/Smartschool-Achievements/website/';
 
   const LEADERBOARD_NAME_PARTS = {
-    adj: ['Brisk', 'Quiet', 'Solar', 'Nova', 'Iron', 'Swift', 'Wild', 'Lunar', 'Sharp', 'Bold', 'Bright', 'Silent', 'Mighty', 'Clever', 'Fierce', 'Noble', 'Sly', 'Vivid', 'Daring', 'Stealthy'],
-    noun: ['Falcon', 'Comet', 'River', 'Pine', 'Echo', 'Orbit', 'Signal', 'Harbor', 'Glade', 'Forge', 'Shadow', 'Blaze', 'Canyon', 'Meadow', 'Storm', 'Peak', 'Valley', 'Wolf', 'Hawk', 'Sparrow']
-  };
+        adj: [
+          'Brisk', 'Quiet', 'Solar', 'Nova', 'Iron', 'Swift', 'Wild', 'Lunar', 'Sharp', 'Bold',
+          'Bright', 'Silent', 'Mighty', 'Clever', 'Fierce', 'Noble', 'Sly', 'Vivid', 'Daring', 'Stealthy',
+          'Golden', 'Crimson', 'Azure', 'Amber', 'Emerald', 'Crystal', 'Shadowed', 'Stormy', 'Radiant', 'Frosty',
+          'Glowing', 'Rugged', 'Curious', 'Fearless', 'Gentle', 'Hollow', 'Jovial', 'Keen', 'Lucky', 'Mellow'
+        ],
+        noun: [
+          'Falcon', 'Comet', 'River', 'Pine', 'Echo', 'Orbit', 'Signal', 'Harbor', 'Glade', 'Forge',
+          'Shadow', 'Blaze', 'Canyon', 'Meadow', 'Storm', 'Peak', 'Valley', 'Wolf', 'Hawk', 'Sparrow',
+          'Cinder', 'Flare', 'Vortex', 'Summit', 'Beacon', 'Drift', 'Cascade', 'Harrier', 'Wanderer', 'Trail',
+          'Grove', 'Mariner', 'Outrider', 'Quill', 'Ridge', 'Sage', 'Tide', 'Voyager', 'Zephyr', 'Anchor'
+        ]
+      };
 
   function createLeaderboardName() {
     const adj = LEADERBOARD_NAME_PARTS.adj[Math.floor(Math.random() * LEADERBOARD_NAME_PARTS.adj.length)];
