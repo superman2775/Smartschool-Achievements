@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Smartschool Achievements Auth</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        background: #f5f5f5;
+        color: #222;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px 28px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        max-width: 420px;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 1.3rem;
+        margin: 0 0 8px;
+      }
+
+      p {
+        margin: 0;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Finishing sign-in...</h1>
+      <p>You can close this tab once it completes.</p>
+      <p id="status"></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const SUPABASE_URL = 'https://gyyijtmbnnfjnywajbcg.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eWlqdG1ibm5mam55d2FqYmNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjkxMzUsImV4cCI6MjA4OTAwNTEzNX0.FRs1eH7rAZ_EW2dyHtpKfKKsoe5nHQHvSUmZv5TeJCE';
+      const statusEl = document.getElementById('status');
+
+      const finish = async () => {
+        try {
+          const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+          const { error } = await client.auth.exchangeCodeForSession(window.location.href);
+
+          if (error) {
+            statusEl.textContent = 'Sign-in failed. Please try again.';
+            return;
+          }
+
+          statusEl.textContent = 'Signed in successfully. You can return to the leaderboard.';
+          setTimeout(() => {
+            window.close();
+          }, 500);
+        } catch (err) {
+          statusEl.textContent = 'Sign-in failed. Please try again.';
+        }
+      };
+
+      finish();
+    </script>
+  </body>
+</html>

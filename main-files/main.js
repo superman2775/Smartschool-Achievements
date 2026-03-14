@@ -172,71 +172,97 @@ Author: @superman2775 +@broodje565
 
       let leaderboardOverlay = null;
 
-      function openLeaderboardPopup() {
-        const root = document.body || document.documentElement;
-        if (!root) return;
+        let leaderboardIframe = null;
 
-        if (!leaderboardOverlay) {
-          leaderboardOverlay = document.createElement('div');
-          leaderboardOverlay.id = 'ssa-leaderboard-overlay';
-          leaderboardOverlay.style.position = 'fixed';
-          leaderboardOverlay.style.inset = '0';
-          leaderboardOverlay.style.background = 'rgba(0, 0, 0, 0.45)';
-          leaderboardOverlay.style.zIndex = '2147483647';
-          leaderboardOverlay.style.display = 'flex';
-          leaderboardOverlay.style.alignItems = 'center';
-          leaderboardOverlay.style.justifyContent = 'center';
-          leaderboardOverlay.style.padding = '20px';
-
-          const panel = document.createElement('div');
-          panel.style.width = 'min(960px, 100%)';
-          panel.style.height = 'min(80vh, 720px)';
-          panel.style.background = '#fff';
-          panel.style.borderRadius = '12px';
-          panel.style.boxShadow = '0 18px 40px rgba(0,0,0,0.2)';
-          panel.style.position = 'relative';
-          panel.style.overflow = 'hidden';
-
-          const closeBtn = document.createElement('button');
-          closeBtn.type = 'button';
-          closeBtn.textContent = 'Close';
-          closeBtn.style.position = 'absolute';
-          closeBtn.style.top = '12px';
-          closeBtn.style.right = '12px';
-          closeBtn.style.zIndex = '2';
-          closeBtn.style.padding = '6px 10px';
-          closeBtn.style.borderRadius = '6px';
-          closeBtn.style.border = '1px solid #ccc';
-          closeBtn.style.background = '#fff';
-          closeBtn.style.cursor = 'pointer';
-          closeBtn.style.fontWeight = '600';
-
-          const iframe = document.createElement('iframe');
-          iframe.src = LEADERBOARD_URL;
-          iframe.title = 'Leaderboard';
-          iframe.style.width = '100%';
-          iframe.style.height = '100%';
-          iframe.style.border = 'none';
-
-          closeBtn.addEventListener('click', () => {
-            leaderboardOverlay.remove();
-            leaderboardOverlay = null;
-          });
-
-          leaderboardOverlay.addEventListener('click', (event) => {
-            if (event.target === leaderboardOverlay) {
-              leaderboardOverlay.remove();
-              leaderboardOverlay = null;
-            }
-          });
-
-          panel.appendChild(closeBtn);
-          panel.appendChild(iframe);
-          leaderboardOverlay.appendChild(panel);
+        function buildLeaderboardUrl(clientId) {
+          if (!clientId) return LEADERBOARD_URL;
+          const joiner = LEADERBOARD_URL.includes('?') ? '&' : '?';
+          return `${LEADERBOARD_URL}${joiner}cid=${encodeURIComponent(clientId)}`;
         }
 
-        root.appendChild(leaderboardOverlay);
-      }
+        function openLeaderboardPopup() {
+          const root = document.body || document.documentElement;
+          if (!root) return;
+          const showOverlay = (clientId) => {
+            if (!leaderboardOverlay) {
+              leaderboardOverlay = document.createElement('div');
+              leaderboardOverlay.id = 'ssa-leaderboard-overlay';
+              leaderboardOverlay.style.position = 'fixed';
+              leaderboardOverlay.style.inset = '0';
+              leaderboardOverlay.style.background = 'rgba(0, 0, 0, 0.45)';
+              leaderboardOverlay.style.zIndex = '2147483647';
+              leaderboardOverlay.style.display = 'flex';
+              leaderboardOverlay.style.alignItems = 'center';
+              leaderboardOverlay.style.justifyContent = 'center';
+              leaderboardOverlay.style.padding = '20px';
+
+              const panel = document.createElement('div');
+              panel.style.width = 'min(960px, 100%)';
+              panel.style.height = 'min(80vh, 720px)';
+              panel.style.background = '#fff';
+              panel.style.borderRadius = '12px';
+              panel.style.boxShadow = '0 18px 40px rgba(0,0,0,0.2)';
+              panel.style.position = 'relative';
+              panel.style.overflow = 'hidden';
+
+              const closeBtn = document.createElement('button');
+              closeBtn.type = 'button';
+              closeBtn.textContent = 'Close';
+              closeBtn.style.position = 'absolute';
+              closeBtn.style.top = '12px';
+              closeBtn.style.right = '12px';
+              closeBtn.style.zIndex = '2';
+              closeBtn.style.padding = '6px 10px';
+              closeBtn.style.borderRadius = '6px';
+              closeBtn.style.border = '1px solid #ccc';
+              closeBtn.style.background = '#fff';
+              closeBtn.style.cursor = 'pointer';
+              closeBtn.style.fontWeight = '600';
+
+              leaderboardIframe = document.createElement('iframe');
+              leaderboardIframe.title = 'Leaderboard';
+              leaderboardIframe.style.width = '100%';
+              leaderboardIframe.style.height = '100%';
+              leaderboardIframe.style.border = 'none';
+
+              closeBtn.addEventListener('click', () => {
+                leaderboardOverlay.remove();
+                leaderboardOverlay = null;
+                leaderboardIframe = null;
+              });
+
+              leaderboardOverlay.addEventListener('click', (event) => {
+                if (event.target === leaderboardOverlay) {
+                  leaderboardOverlay.remove();
+                  leaderboardOverlay = null;
+                  leaderboardIframe = null;
+                }
+              });
+
+              panel.appendChild(closeBtn);
+              panel.appendChild(leaderboardIframe);
+              leaderboardOverlay.appendChild(panel);
+            }
+
+            if (leaderboardIframe) {
+              leaderboardIframe.src = buildLeaderboardUrl(clientId);
+            }
+
+            root.appendChild(leaderboardOverlay);
+          };
+
+          chrome.storage.local.get(['ssaLeaderboardClientId'], (res) => {
+            let clientId = res.ssaLeaderboardClientId;
+            if (!clientId) {
+              clientId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : Math.random().toString(36).slice(2) + Date.now().toString(36);
+              chrome.storage.local.set({ ssaLeaderboardClientId: clientId });
+            }
+
+            showOverlay(clientId);
+          });
+        }
 
       leaderboardBtn.addEventListener('click', openLeaderboardPopup);
 

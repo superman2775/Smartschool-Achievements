@@ -85,6 +85,99 @@
         color: var(--muted);
       }
 
+      .auth-card {
+        background: var(--card);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 22px 24px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .auth-header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .auth-buttons {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .auth-btn {
+        appearance: none;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: #fff;
+        color: var(--ink);
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .auth-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      .auth-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+        box-shadow: none;
+        transform: none;
+      }
+
+      .auth-hint {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .name-form {
+        display: grid;
+        gap: 8px;
+      }
+
+      .name-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+
+      .name-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+      }
+
+      .name-input {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 0.95rem;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+      }
+
+      .name-save {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: #fff;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.95rem;
+      }
+
+      .name-save:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
       .leaderboard {
         display: grid;
         gap: 12px;
@@ -171,6 +264,30 @@
         <p>Have fun on this leaderboard!</p>
       </header>
 
+      <section class="auth-card">
+        <div class="auth-header">
+          <div>
+            <strong>Sign in to claim your name</strong>
+            <div id="auth-status" class="status">Not signed in.</div>
+          </div>
+          <button id="sign-out" class="auth-btn" type="button" hidden>Sign out</button>
+        </div>
+        <div class="auth-buttons" id="auth-controls">
+          <button class="auth-btn" type="button" data-provider="google">Continue with Google</button>
+          <button class="auth-btn" type="button" data-provider="discord">Continue with Discord</button>
+          <button class="auth-btn" type="button" data-provider="github">Continue with GitHub</button>
+        </div>
+        <div class="name-form">
+          <label class="name-label" for="display-name">Display name</label>
+          <div class="name-row">
+            <input id="display-name" class="name-input" type="text" placeholder="Choose your name" maxlength="24" />
+            <button id="save-name" class="name-save" type="button">Save name</button>
+          </div>
+          <div id="name-status" class="auth-hint">Sign in to choose a name.</div>
+        </div>
+        <div class="auth-hint">Auth opens in a new tab because this page runs inside an iframe.</div>
+      </section>
+
       <section class="board">
         <div class="board-header">
           <div>
@@ -189,6 +306,7 @@
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eWlqdG1ibm5mam55d2FqYmNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjkxMzUsImV4cCI6MjA4OTAwNTEzNX0.FRs1eH7rAZ_EW2dyHtpKfKKsoe5nHQHvSUmZv5TeJCE';
       const LEADERBOARD_TABLE = 'leaderboard';
       const PAGE_SIZE = 500;
+      const AUTH_REDIRECT = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-callback.html';
 
       const fallbackParts = {
         adj: [
@@ -205,16 +323,136 @@
         ]
       };
 
-      const leaderboardEl = document.getElementById('leaderboard');
-      const statusEl = document.getElementById('status');
-      const updatedEl = document.getElementById('last-updated');
-
       const isConfigured = () =>
         SUPABASE_URL &&
         SUPABASE_ANON_KEY &&
         !SUPABASE_URL.includes('YOUR_') &&
         !SUPABASE_ANON_KEY.includes('YOUR_');
 
+      const supabaseClient = isConfigured()
+        ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        : null;
+
+      const leaderboardEl = document.getElementById('leaderboard');
+      const statusEl = document.getElementById('status');
+      const updatedEl = document.getElementById('last-updated');
+      const authStatusEl = document.getElementById('auth-status');
+      const authControlsEl = document.getElementById('auth-controls');
+      const signOutBtn = document.getElementById('sign-out');
+      const nameInputEl = document.getElementById('display-name');
+      const saveNameBtn = document.getElementById('save-name');
+      const nameStatusEl = document.getElementById('name-status');
+      const linkedClientId = new URLSearchParams(window.location.search).get('cid');
+      let currentSession = null;
+
+      const setNameControls = (enabled) => {
+        if (!nameInputEl || !saveNameBtn) return;
+        nameInputEl.disabled = !enabled;
+        saveNameBtn.disabled = !enabled;
+      };
+
+      const normalizeName = (value) => value.trim().replace(/\s+/g, ' ');
+
+      const loadLinkedName = async () => {
+        if (!supabaseClient || !linkedClientId || !nameInputEl) return;
+        const { data, error } = await supabaseClient
+          .from(LEADERBOARD_TABLE)
+          .select('name')
+          .eq('client_id', linkedClientId)
+          .limit(1);
+
+        if (!error && data && data[0] && data[0].name) {
+          nameInputEl.value = data[0].name;
+        }
+      };
+
+      const setNameUi = async (session) => {
+        if (!nameStatusEl) return;
+
+        if (!supabaseClient) {
+          nameStatusEl.textContent = 'Supabase is not configured yet.';
+          setNameControls(false);
+          return;
+        }
+
+        if (!session) {
+          nameStatusEl.textContent = 'Sign in to choose a name.';
+          setNameControls(false);
+          return;
+        }
+
+        if (!linkedClientId) {
+          nameStatusEl.textContent = 'Open the leaderboard from the extension to link your account.';
+          setNameControls(false);
+          return;
+        }
+
+        nameStatusEl.textContent = 'Choose a display name (3-24 characters).';
+        setNameControls(true);
+        if (!nameInputEl.dataset.loaded) {
+          await loadLinkedName();
+          nameInputEl.dataset.loaded = 'true';
+        }
+      };
+
+      const setAuthUi = (session) => {
+        currentSession = session;
+        if (!authStatusEl) return;
+
+        if (!supabaseClient) {
+          authStatusEl.textContent = 'Supabase is not configured yet.';
+          if (authControlsEl) {
+            authControlsEl.querySelectorAll('button').forEach((btn) => {
+              btn.disabled = true;
+            });
+          }
+          if (signOutBtn) {
+            signOutBtn.hidden = true;
+          }
+          return;
+        }
+
+        if (session && session.user) {
+          const meta = session.user.user_metadata || {};
+          const name = meta.full_name || meta.user_name || session.user.email || 'Signed in';
+          authStatusEl.textContent = `Signed in as ${name}.`;
+          if (signOutBtn) {
+            signOutBtn.hidden = false;
+          }
+        } else {
+          authStatusEl.textContent = 'Not signed in.';
+          if (signOutBtn) {
+            signOutBtn.hidden = true;
+          }
+        }
+
+        setNameUi(session);
+      };
+
+      const startOAuth = async (provider) => {
+        if (!supabaseClient) {
+          setAuthUi(null);
+          return;
+        }
+
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo: AUTH_REDIRECT,
+            skipBrowserRedirect: true
+          }
+        });
+
+        if (error || !data?.url) {
+          authStatusEl.textContent = 'Could not start sign-in.';
+          return;
+        }
+
+        const authWindow = window.open(data.url, '_blank', 'width=520,height=720');
+        if (!authWindow) {
+          window.location.href = data.url;
+        }
+      };
       const randomName = () => {
         const adj = fallbackParts.adj[Math.floor(Math.random() * fallbackParts.adj.length)];
         const noun = fallbackParts.noun[Math.floor(Math.random() * fallbackParts.noun.length)];
@@ -293,14 +531,13 @@
       };
 
       const loadLeaderboard = async () => {
-        if (!isConfigured()) {
+        if (!supabaseClient) {
           renderFallback();
           return;
         }
 
         statusEl.textContent = 'Syncing with Supabase...';
-        const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const { data, error } = await fetchAllRows(client);
+        const { data, error } = await fetchAllRows(supabaseClient);
 
         if (error) {
           statusEl.textContent = 'Could not load the leaderboard.';
@@ -315,6 +552,93 @@
       };
 
       loadLeaderboard();
+
+      if (supabaseClient) {
+        supabaseClient.auth.getSession().then(({ data }) => {
+          setAuthUi(data?.session || null);
+        });
+
+        supabaseClient.auth.onAuthStateChange((_event, session) => {
+          setAuthUi(session);
+        });
+      } else {
+        setAuthUi(null);
+      }
+
+      if (authControlsEl) {
+        authControlsEl.querySelectorAll('button[data-provider]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            startOAuth(btn.dataset.provider);
+          });
+        });
+      }
+
+      if (signOutBtn) {
+        signOutBtn.addEventListener('click', async () => {
+          if (!supabaseClient) return;
+          await supabaseClient.auth.signOut();
+        });
+      }
+
+      if (saveNameBtn) {
+        saveNameBtn.addEventListener('click', async () => {
+          if (!supabaseClient || !currentSession) {
+            if (nameStatusEl) {
+              nameStatusEl.textContent = 'Sign in to choose a name.';
+            }
+            return;
+          }
+
+          if (!linkedClientId) {
+            if (nameStatusEl) {
+              nameStatusEl.textContent = 'Open the leaderboard from the extension to link your account.';
+            }
+            return;
+          }
+
+          const cleaned = normalizeName(nameInputEl.value || '');
+          if (cleaned.length < 3 || cleaned.length > 24) {
+            nameStatusEl.textContent = 'Name must be 3-24 characters.';
+            return;
+          }
+
+          saveNameBtn.disabled = true;
+          const now = new Date().toISOString();
+          const { data: updated, error: updateError } = await supabaseClient
+            .from(LEADERBOARD_TABLE)
+            .update({ name: cleaned, updated_at: now })
+            .eq('client_id', linkedClientId)
+            .select('client_id');
+
+          if (updateError) {
+            nameStatusEl.textContent = 'Could not save name.';
+            saveNameBtn.disabled = false;
+            return;
+          }
+
+          if (!updated || updated.length === 0) {
+            const { error: upsertError } = await supabaseClient
+              .from(LEADERBOARD_TABLE)
+              .upsert({
+                client_id: linkedClientId,
+                name: cleaned,
+                xp: 0,
+                level: 0,
+                updated_at: now
+              });
+
+            if (upsertError) {
+              nameStatusEl.textContent = 'Could not save name.';
+              saveNameBtn.disabled = false;
+              return;
+            }
+          }
+
+          nameStatusEl.textContent = 'Name updated.';
+          saveNameBtn.disabled = false;
+          loadLeaderboard();
+        });
+      }
     </script>
   </body>
 </html>
