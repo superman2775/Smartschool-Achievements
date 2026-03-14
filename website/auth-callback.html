@@ -42,7 +42,10 @@
       <p id="status"></p>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+      const SUPABASE_URL = 'https://gyyijtmbnnfjnywajbcg.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eWlqdG1ibm5mam55d2FqYmNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjkxMzUsImV4cCI6MjA4OTAwNTEzNX0.FRs1eH7rAZ_EW2dyHtpKfKKsoe5nHQHvSUmZv5TeJCE';
       const statusEl = document.getElementById('status');
 
       const parseParams = (source) => {
@@ -54,11 +57,7 @@
         return entries;
       };
 
-      const finish = () => {
-        const hashParams = parseParams(window.location.hash || '');
-        const accessToken = hashParams.access_token;
-        const refreshToken = hashParams.refresh_token;
-
+      const postSession = (accessToken, refreshToken, cid) => {
         if (!accessToken || !refreshToken) {
           statusEl.textContent = 'Sign-in failed. Please try again.';
           return;
@@ -68,7 +67,8 @@
           window.opener.postMessage({
             type: 'SSA_AUTH',
             access_token: accessToken,
-            refresh_token: refreshToken
+            refresh_token: refreshToken,
+            cid
           }, window.location.origin);
         }
 
@@ -76,6 +76,37 @@
         setTimeout(() => {
           window.close();
         }, 500);
+      };
+
+      const finish = async () => {
+        const hashParams = parseParams(window.location.hash || '');
+        const queryParams = new URLSearchParams(window.location.search);
+        const cid = queryParams.get('cid');
+
+        if (hashParams.access_token && hashParams.refresh_token) {
+          postSession(hashParams.access_token, hashParams.refresh_token, cid);
+          return;
+        }
+
+        const code = queryParams.get('code');
+        if (!code) {
+          statusEl.textContent = 'Sign-in failed. Please try again.';
+          return;
+        }
+
+        try {
+          const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+          const { data, error } = await client.auth.exchangeCodeForSession(code);
+
+          if (error || !data?.session) {
+            statusEl.textContent = 'Sign-in failed. Please try again.';
+            return;
+          }
+
+          postSession(data.session.access_token, data.session.refresh_token, cid);
+        } catch (err) {
+          statusEl.textContent = 'Sign-in failed. Please try again.';
+        }
       };
 
       finish();

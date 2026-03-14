@@ -307,6 +307,7 @@
       const LEADERBOARD_TABLE = 'leaderboard';
       const PAGE_SIZE = 500;
       const AUTH_REDIRECT = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-callback.html';
+      const AUTH_START = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-start.html';
 
       const fallbackParts = {
         adj: [
@@ -436,28 +437,22 @@
         setNameUi(session);
       };
 
-      const startOAuth = async (provider) => {
+      const startOAuth = (provider) => {
         if (!supabaseClient) {
           setAuthUi(null);
           return;
         }
 
-        const { data, error } = await supabaseClient.auth.signInWithOAuth({
-          provider,
-          options: {
-            redirectTo: AUTH_REDIRECT,
-            skipBrowserRedirect: true
-          }
-        });
-
-        if (error || !data?.url) {
-          authStatusEl.textContent = 'Could not start sign-in.';
-          return;
+        const params = new URLSearchParams({ provider });
+        if (linkedClientId) {
+          params.set('cid', linkedClientId);
         }
+        params.set('redirect', AUTH_REDIRECT);
 
-        const authWindow = window.open(data.url, '_blank', 'width=520,height=720');
+        const authUrl = `${AUTH_START}?${params.toString()}`;
+        const authWindow = window.open(authUrl, '_blank', 'width=520,height=720');
         if (!authWindow) {
-          window.location.href = data.url;
+          window.location.href = authUrl;
         }
       };
       const randomName = () => {

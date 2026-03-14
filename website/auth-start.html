@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Smartschool Achievements Sign-In</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        background: #f5f5f5;
+        color: #222;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px 28px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        max-width: 420px;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 1.25rem;
+        margin: 0 0 8px;
+      }
+
+      p {
+        margin: 0;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Starting sign-in...</h1>
+      <p id="status">Redirecting to your provider.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const SUPABASE_URL = 'https://gyyijtmbnnfjnywajbcg.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eWlqdG1ibm5mam55d2FqYmNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjkxMzUsImV4cCI6MjA4OTAwNTEzNX0.FRs1eH7rAZ_EW2dyHtpKfKKsoe5nHQHvSUmZv5TeJCE';
+      const statusEl = document.getElementById('status');
+
+      const params = new URLSearchParams(window.location.search);
+      const provider = params.get('provider');
+      const cid = params.get('cid');
+      const redirect = params.get('redirect');
+
+      const allowed = ['google', 'discord', 'github'];
+      if (!provider || !allowed.includes(provider)) {
+        statusEl.textContent = 'Unknown provider.';
+      } else {
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const redirectTo = (() => {
+          if (!redirect) return null;
+          if (cid) {
+            const joiner = redirect.includes('?') ? '&' : '?';
+            return `${redirect}${joiner}cid=${encodeURIComponent(cid)}`;
+          }
+          return redirect;
+        })();
+
+        client.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo
+          }
+        }).catch(() => {
+          statusEl.textContent = 'Could not start sign-in.';
+        });
+      }
+    </script>
+  </body>
+</html>
