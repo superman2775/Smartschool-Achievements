@@ -167,6 +167,100 @@
         font-size: 0.85rem;
         width: fit-content;
       }
+
+      .admin-card {
+        background: var(--card);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 22px 24px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .admin-card[hidden] {
+        display: none;
+      }
+
+      .admin-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .admin-filter {
+        flex: 1;
+        min-width: 220px;
+      }
+
+      .admin-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .admin-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #f7f6f2;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+
+      .admin-row:nth-child(odd) {
+        background: #f0f7f5;
+      }
+
+      .admin-main {
+        display: grid;
+        gap: 4px;
+      }
+
+      .admin-name {
+        font-weight: 600;
+      }
+
+      .admin-meta {
+        font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      .admin-actions {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .ban-btn {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        background: #fff;
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.85rem;
+      }
+
+      .ban-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .ban-btn.ban {
+        color: #c62828;
+        border-color: rgba(198, 40, 40, 0.35);
+        background: #fff1f1;
+      }
+
+      .ban-btn.unban {
+        color: #2e7d32;
+        border-color: rgba(46, 125, 50, 0.35);
+        background: #f1fff2;
+      }
     </style>
   </head>
   <body>
@@ -200,6 +294,26 @@
         </div>
         <div class="auth-hint">Auth opens in a new tab because the leaderboard runs inside an iframe.</div>
       </section>
+
+      <section id="admin-card" class="admin-card" hidden>
+        <div class="auth-header">
+          <div>
+            <strong>Admin tools</strong>
+            <div id="admin-status" class="auth-hint">Checking admin access...</div>
+          </div>
+          <button id="admin-refresh" class="auth-btn" type="button">Refresh list</button>
+        </div>
+        <div class="admin-controls">
+          <input
+            id="admin-filter"
+            class="name-input admin-filter"
+            type="text"
+            placeholder="Filter by name or id"
+            autocomplete="off"
+          />
+        </div>
+        <div id="admin-list" class="admin-list"></div>
+      </section>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -207,6 +321,8 @@
       const SUPABASE_URL = 'https://gyyijtmbnnfjnywajbcg.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eWlqdG1ibm5mam55d2FqYmNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjkxMzUsImV4cCI6MjA4OTAwNTEzNX0.FRs1eH7rAZ_EW2dyHtpKfKKsoe5nHQHvSUmZv5TeJCE';
       const LEADERBOARD_TABLE = 'leaderboard';
+      const ADMIN_TABLE = 'leaderboard_admins';
+      const ADMIN_PAGE_SIZE = 500;
       const AUTH_REDIRECT = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-callback.html';
       const AUTH_START = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-start.html';
 
@@ -239,7 +355,15 @@
       const nameInputEl = document.getElementById('display-name');
       const saveNameBtn = document.getElementById('save-name');
       const nameStatusEl = document.getElementById('name-status');
+      const adminCard = document.getElementById('admin-card');
+      const adminStatusEl = document.getElementById('admin-status');
+      const adminListEl = document.getElementById('admin-list');
+      const adminRefreshBtn = document.getElementById('admin-refresh');
+      const adminFilterInput = document.getElementById('admin-filter');
       let currentSession = null;
+      let adminRows = [];
+      let isAdminUser = false;
+      let adminUserId = null;
 
       const setNameControls = (enabled) => {
         if (!nameInputEl || !saveNameBtn) return;
@@ -291,12 +415,220 @@
         }
       };
 
+      const formatAdminMeta = (row) => {
+        const xpValue = typeof row.xp === 'number' ? row.xp : 0;
+        const status = row.banned ? 'BANNED' : 'ACTIVE';
+        const clientId = row.client_id || 'unknown-id';
+        return `XP ${xpValue} | ${clientId} | ${status}`;
+      };
+
+      const filterAdminRows = (rows) => {
+        if (!adminFilterInput) return rows;
+        const query = adminFilterInput.value.trim().toLowerCase();
+        if (!query) return rows;
+        return rows.filter((row) => {
+          const name = (row.name || '').toLowerCase();
+          const clientId = (row.client_id || '').toLowerCase();
+          return name.includes(query) || clientId.includes(query);
+        });
+      };
+
+      const toggleBan = async (row, button, metaEl) => {
+        if (!supabaseClient || !button) return;
+        const nextBanned = !row.banned;
+        button.disabled = true;
+        const now = new Date().toISOString();
+        const { error } = await supabaseClient
+          .from(LEADERBOARD_TABLE)
+          .update({
+            banned: nextBanned,
+            banned_at: nextBanned ? now : null,
+            updated_at: now
+          })
+          .eq('client_id', row.client_id);
+
+        if (error) {
+          if (adminStatusEl) {
+            adminStatusEl.textContent = 'Could not update ban status.';
+          }
+          button.disabled = false;
+          return;
+        }
+
+        row.banned = nextBanned;
+        button.textContent = row.banned ? 'Unban' : 'Ban';
+        button.classList.toggle('ban', !row.banned);
+        button.classList.toggle('unban', row.banned);
+        if (metaEl) {
+          metaEl.textContent = formatAdminMeta(row);
+        }
+        if (adminStatusEl) {
+          const label = row.name || row.client_id || 'user';
+          adminStatusEl.textContent = row.banned ? `Banned ${label}.` : `Unbanned ${label}.`;
+        }
+        button.disabled = false;
+      };
+
+      const renderAdminRows = (rows) => {
+        if (!adminListEl) return;
+        adminListEl.innerHTML = '';
+
+        if (!rows.length) {
+          if (adminStatusEl) {
+            adminStatusEl.textContent = adminRows.length ? 'No matches.' : 'No users yet.';
+          }
+          return;
+        }
+
+        if (adminStatusEl) {
+          const filtered = adminFilterInput && adminFilterInput.value.trim().length > 0;
+          adminStatusEl.textContent = filtered
+            ? `Showing ${rows.length} of ${adminRows.length} users.`
+            : `Loaded ${rows.length} users.`;
+        }
+
+        rows.forEach((row) => {
+          row.banned = row.banned === true;
+          const item = document.createElement('div');
+          item.className = 'admin-row';
+
+          const main = document.createElement('div');
+          main.className = 'admin-main';
+
+          const nameEl = document.createElement('div');
+          nameEl.className = 'admin-name';
+          nameEl.textContent = row.name && row.name.trim().length ? row.name : 'Unnamed';
+
+          const metaEl = document.createElement('div');
+          metaEl.className = 'admin-meta';
+          metaEl.textContent = formatAdminMeta(row);
+
+          main.appendChild(nameEl);
+          main.appendChild(metaEl);
+
+          const actions = document.createElement('div');
+          actions.className = 'admin-actions';
+
+          const banBtn = document.createElement('button');
+          banBtn.type = 'button';
+          banBtn.className = `ban-btn ${row.banned ? 'unban' : 'ban'}`;
+          banBtn.textContent = row.banned ? 'Unban' : 'Ban';
+          banBtn.addEventListener('click', () => {
+            toggleBan(row, banBtn, metaEl);
+          });
+
+          actions.appendChild(banBtn);
+          item.appendChild(main);
+          item.appendChild(actions);
+          adminListEl.appendChild(item);
+        });
+      };
+
+      const fetchAdminRows = async () => {
+        let allRows = [];
+        let from = 0;
+
+        while (true) {
+          const { data, error } = await supabaseClient
+            .from(LEADERBOARD_TABLE)
+            .select('client_id, name, xp, banned, updated_at')
+            .order('xp', { ascending: false })
+            .order('updated_at', { ascending: false })
+            .order('client_id', { ascending: true })
+            .range(from, from + ADMIN_PAGE_SIZE - 1);
+
+          if (error) {
+            return { data: null, error };
+          }
+
+          if (!data || data.length === 0) {
+            break;
+          }
+
+          allRows = allRows.concat(data);
+
+          if (data.length < ADMIN_PAGE_SIZE) {
+            break;
+          }
+
+          from += ADMIN_PAGE_SIZE;
+        }
+
+        return { data: allRows, error: null };
+      };
+
+      const loadAdminList = async () => {
+        if (!supabaseClient || !isAdminUser) return;
+        if (adminStatusEl) {
+          adminStatusEl.textContent = 'Loading users...';
+        }
+
+        const { data, error } = await fetchAdminRows();
+
+        if (error) {
+          if (adminStatusEl) {
+            adminStatusEl.textContent = 'Could not load users.';
+          }
+          return;
+        }
+
+        adminRows = data || [];
+        renderAdminRows(filterAdminRows(adminRows));
+      };
+
+      const checkAdmin = async (session) => {
+        if (!supabaseClient || !session?.user) return false;
+        const { data, error } = await supabaseClient
+          .from(ADMIN_TABLE)
+          .select('user_id')
+          .eq('user_id', session.user.id)
+          .limit(1);
+
+        if (error) {
+          return false;
+        }
+
+        return !!(data && data.length);
+      };
+
+      const setAdminUi = async (session) => {
+        if (!adminCard || !adminStatusEl) return;
+
+        if (!supabaseClient || !session?.user) {
+          adminCard.hidden = true;
+          isAdminUser = false;
+          adminRows = [];
+          adminUserId = null;
+          return;
+        }
+
+        if (adminUserId !== session.user.id) {
+          adminRows = [];
+        }
+        adminUserId = session.user.id;
+
+        adminStatusEl.textContent = 'Checking admin access...';
+        const allowed = await checkAdmin(session);
+        isAdminUser = allowed;
+
+        if (!allowed) {
+          adminCard.hidden = true;
+          return;
+        }
+
+        adminCard.hidden = false;
+        await loadAdminList();
+      };
+
       const setAuthUi = (session) => {
         currentSession = session;
         if (!authStatusEl) return;
 
         if (!supabaseClient) {
           authStatusEl.textContent = 'Supabase is not configured yet.';
+          if (adminCard) {
+            adminCard.hidden = true;
+          }
           if (authControlsEl) {
             authControlsEl.querySelectorAll('button').forEach((btn) => {
               btn.disabled = true;
@@ -323,6 +655,7 @@
         }
 
         setNameUi(session);
+        setAdminUi(session);
       };
 
       const startOAuth = (provider) => {
@@ -459,6 +792,18 @@
 
           nameStatusEl.textContent = 'Name updated.';
           saveNameBtn.disabled = false;
+        });
+      }
+
+      if (adminRefreshBtn) {
+        adminRefreshBtn.addEventListener('click', () => {
+          loadAdminList();
+        });
+      }
+
+      if (adminFilterInput) {
+        adminFilterInput.addEventListener('input', () => {
+          renderAdminRows(filterAdminRows(adminRows));
         });
       }
 
