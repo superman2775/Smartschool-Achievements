@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Smartschool Achievements Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f3efe6;
+        --bg-accent: #e4f2ff;
+        --ink: #1b1b1b;
+        --muted: #57606a;
+        --card: #ffffff;
+        --accent: #f57c00;
+        --shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: var(--ink);
+        background: radial-gradient(circle at 10% 20%, var(--bg-accent), transparent 55%),
+          radial-gradient(circle at 85% 10%, #ffe9d1, transparent 50%),
+          var(--bg);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 20px;
+      }
+
+      .shell {
+        width: min(720px, 100%);
+        display: grid;
+        gap: 20px;
+      }
+
+      header {
+        display: grid;
+        gap: 8px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 3vw, 2.6rem);
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .auth-card {
+        background: var(--card);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 22px 24px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .auth-header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .auth-buttons {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .auth-btn {
+        appearance: none;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: #fff;
+        color: var(--ink);
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .auth-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      .auth-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+        box-shadow: none;
+        transform: none;
+      }
+
+      .auth-hint {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .name-form {
+        display: grid;
+        gap: 8px;
+      }
+
+      .name-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+
+      .name-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+      }
+
+      .name-input {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 0.95rem;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+      }
+
+      .name-save {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: #fff;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.95rem;
+      }
+
+      .name-save:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        background: #fff;
+        color: var(--ink);
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.85rem;
+        width: fit-content;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <a id="back-link" class="back-link" href="index.html">Back to leaderboard</a>
+        <h1>Sign in to claim your name</h1>
+        <p>Log in with your preferred provider and choose the name shown on the leaderboard.</p>
+      </header>
+
+      <section class="auth-card">
+        <div class="auth-header">
+          <div>
+            <strong>Account</strong>
+            <div id="auth-status" class="auth-hint">Not signed in.</div>
+          </div>
+          <button id="sign-out" class="auth-btn" type="button" hidden>Sign out</button>
+        </div>
+        <div class="auth-buttons" id="auth-controls">
+          <button class="auth-btn" type="button" data-provider="google">Continue with Google</button>
+          <button class="auth-btn" type="button" data-provider="discord">Continue with Discord</button>
+          <button class="auth-btn" type="button" data-provider="github">Continue with GitHub</button>
+        </div>
+        <div class="name-form">
+          <label class="name-label" for="display-name">Display name</label>
+          <div class="name-row">
+            <input id="display-name" class="name-input" type="text" placeholder="Choose your name" maxlength="24" />
+            <button id="save-name" class="name-save" type="button">Save name</button>
+          </div>
+          <div id="name-status" class="auth-hint">Sign in to choose a name.</div>
+        </div>
+        <div class="auth-hint">Auth opens in a new tab because the leaderboard runs inside an iframe.</div>
+      </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const SUPABASE_URL = 'https://gyyijtmbnnfjnywajbcg.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eWlqdG1ibm5mam55d2FqYmNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjkxMzUsImV4cCI6MjA4OTAwNTEzNX0.FRs1eH7rAZ_EW2dyHtpKfKKsoe5nHQHvSUmZv5TeJCE';
+      const LEADERBOARD_TABLE = 'leaderboard';
+      const AUTH_REDIRECT = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-callback.html';
+      const AUTH_START = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-start.html';
+
+      const linkedClientId = new URLSearchParams(window.location.search).get('cid');
+      const backLink = document.getElementById('back-link');
+      if (backLink && linkedClientId) {
+        backLink.href = `index.html?cid=${encodeURIComponent(linkedClientId)}`;
+      }
+
+      const isConfigured = () =>
+        SUPABASE_URL &&
+        SUPABASE_ANON_KEY &&
+        !SUPABASE_URL.includes('YOUR_') &&
+        !SUPABASE_ANON_KEY.includes('YOUR_');
+
+      const supabaseClient = isConfigured()
+        ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+              flowType: 'implicit',
+              persistSession: false,
+              autoRefreshToken: false,
+              detectSessionInUrl: false
+            }
+          })
+        : null;
+
+      const authStatusEl = document.getElementById('auth-status');
+      const authControlsEl = document.getElementById('auth-controls');
+      const signOutBtn = document.getElementById('sign-out');
+      const nameInputEl = document.getElementById('display-name');
+      const saveNameBtn = document.getElementById('save-name');
+      const nameStatusEl = document.getElementById('name-status');
+      let currentSession = null;
+
+      const setNameControls = (enabled) => {
+        if (!nameInputEl || !saveNameBtn) return;
+        nameInputEl.disabled = !enabled;
+        saveNameBtn.disabled = !enabled;
+      };
+
+      const normalizeName = (value) => value.trim().replace(/\s+/g, ' ');
+
+      const loadLinkedName = async () => {
+        if (!supabaseClient || !linkedClientId || !nameInputEl) return;
+        const { data, error } = await supabaseClient
+          .from(LEADERBOARD_TABLE)
+          .select('name')
+          .eq('client_id', linkedClientId)
+          .limit(1);
+
+        if (!error && data && data[0] && data[0].name) {
+          nameInputEl.value = data[0].name;
+        }
+      };
+
+      const setNameUi = async (session) => {
+        if (!nameStatusEl) return;
+
+        if (!supabaseClient) {
+          nameStatusEl.textContent = 'Supabase is not configured yet.';
+          setNameControls(false);
+          return;
+        }
+
+        if (!session) {
+          nameStatusEl.textContent = 'Sign in to choose a name.';
+          setNameControls(false);
+          return;
+        }
+
+        if (!linkedClientId) {
+          nameStatusEl.textContent = 'Open the leaderboard from the extension to link your account.';
+          setNameControls(false);
+          return;
+        }
+
+        nameStatusEl.textContent = 'Choose a display name (3-24 characters).';
+        setNameControls(true);
+        if (!nameInputEl.dataset.loaded) {
+          await loadLinkedName();
+          nameInputEl.dataset.loaded = 'true';
+        }
+      };
+
+      const setAuthUi = (session) => {
+        currentSession = session;
+        if (!authStatusEl) return;
+
+        if (!supabaseClient) {
+          authStatusEl.textContent = 'Supabase is not configured yet.';
+          if (authControlsEl) {
+            authControlsEl.querySelectorAll('button').forEach((btn) => {
+              btn.disabled = true;
+            });
+          }
+          if (signOutBtn) {
+            signOutBtn.hidden = true;
+          }
+          return;
+        }
+
+        if (session && session.user) {
+          const meta = session.user.user_metadata || {};
+          const name = meta.full_name || meta.user_name || session.user.email || 'Signed in';
+          authStatusEl.textContent = `Signed in as ${name}.`;
+          if (signOutBtn) {
+            signOutBtn.hidden = false;
+          }
+        } else {
+          authStatusEl.textContent = 'Not signed in.';
+          if (signOutBtn) {
+            signOutBtn.hidden = true;
+          }
+        }
+
+        setNameUi(session);
+      };
+
+      const startOAuth = (provider) => {
+        if (!supabaseClient) {
+          setAuthUi(null);
+          return;
+        }
+
+        const params = new URLSearchParams({ provider });
+        if (linkedClientId) {
+          params.set('cid', linkedClientId);
+        }
+        params.set('redirect', AUTH_REDIRECT);
+
+        const authUrl = `${AUTH_START}?${params.toString()}`;
+        const authWindow = window.open(authUrl, '_blank', 'width=520,height=720');
+        if (!authWindow) {
+          window.location.href = authUrl;
+        }
+      };
+
+      if (supabaseClient) {
+        const loadCachedSession = async () => {
+          try {
+            const cached = sessionStorage.getItem('ssa_auth_session');
+            if (!cached) {
+              setAuthUi(null);
+              return;
+            }
+
+            const parsed = JSON.parse(cached);
+            if (!parsed?.access_token || !parsed?.refresh_token) {
+              setAuthUi(null);
+              return;
+            }
+
+            const { data, error } = await supabaseClient.auth.setSession({
+              access_token: parsed.access_token,
+              refresh_token: parsed.refresh_token
+            });
+
+            if (error) {
+              setAuthUi(null);
+              return;
+            }
+
+            const session = data?.session || null;
+            setAuthUi(session);
+          } catch {
+            setAuthUi(null);
+          }
+        };
+
+        loadCachedSession();
+
+        supabaseClient.auth.onAuthStateChange((_event, session) => {
+          setAuthUi(session);
+        });
+      } else {
+        setAuthUi(null);
+      }
+
+      if (authControlsEl) {
+        authControlsEl.querySelectorAll('button[data-provider]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            startOAuth(btn.dataset.provider);
+          });
+        });
+      }
+
+      if (signOutBtn) {
+        signOutBtn.addEventListener('click', async () => {
+          if (!supabaseClient) return;
+          try {
+            sessionStorage.removeItem('ssa_auth_session');
+          } catch {}
+          await supabaseClient.auth.signOut();
+        });
+      }
+
+      if (saveNameBtn) {
+        saveNameBtn.addEventListener('click', async () => {
+          if (!supabaseClient || !currentSession) {
+            if (nameStatusEl) {
+              nameStatusEl.textContent = 'Sign in to choose a name.';
+            }
+            return;
+          }
+
+          if (!linkedClientId) {
+            if (nameStatusEl) {
+              nameStatusEl.textContent = 'Open the leaderboard from the extension to link your account.';
+            }
+            return;
+          }
+
+          const cleaned = normalizeName(nameInputEl.value || '');
+          if (cleaned.length < 3 || cleaned.length > 24) {
+            nameStatusEl.textContent = 'Name must be 3-24 characters.';
+            return;
+          }
+
+          saveNameBtn.disabled = true;
+          const now = new Date().toISOString();
+          const { data: updated, error: updateError } = await supabaseClient
+            .from(LEADERBOARD_TABLE)
+            .update({ name: cleaned, updated_at: now })
+            .eq('client_id', linkedClientId)
+            .select('client_id');
+
+          if (updateError) {
+            nameStatusEl.textContent = 'Could not save name.';
+            saveNameBtn.disabled = false;
+            return;
+          }
+
+          if (!updated || updated.length === 0) {
+            const { error: upsertError } = await supabaseClient
+              .from(LEADERBOARD_TABLE)
+              .upsert({
+                client_id: linkedClientId,
+                name: cleaned,
+                xp: 0,
+                level: 0,
+                updated_at: now
+              });
+
+            if (upsertError) {
+              nameStatusEl.textContent = 'Could not save name.';
+              saveNameBtn.disabled = false;
+              return;
+            }
+          }
+
+          nameStatusEl.textContent = 'Name updated.';
+          saveNameBtn.disabled = false;
+        });
+      }
+
+      window.addEventListener('message', async (event) => {
+        if (event.origin !== window.location.origin) return;
+        if (!event.data || event.data.type !== 'SSA_AUTH') return;
+        if (!supabaseClient) return;
+
+        const { access_token, refresh_token } = event.data;
+        if (!access_token || !refresh_token) {
+          setAuthUi(null);
+          return;
+        }
+
+        const { data, error } = await supabaseClient.auth.setSession({
+          access_token,
+          refresh_token
+        });
+
+        if (error) {
+          setAuthUi(null);
+          return;
+        }
+
+        try {
+          sessionStorage.setItem('ssa_auth_session', JSON.stringify({ access_token, refresh_token }));
+        } catch {}
+
+        const session = data?.session || null;
+        setAuthUi(session);
+      });
+    </script>
+  </body>
+</html>

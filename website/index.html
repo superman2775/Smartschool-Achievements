@@ -79,103 +79,30 @@
         gap: 12px;
       }
 
-      .board-header .meta {
-        font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
-        font-size: 0.85rem;
-        color: var(--muted);
-      }
-
-      .auth-card {
-        background: var(--card);
-        border-radius: 18px;
-        box-shadow: var(--shadow);
-        padding: 22px 24px;
-        display: grid;
-        gap: 16px;
-      }
-
-      .auth-header {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        justify-content: space-between;
+      .profile-link {
+        display: inline-flex;
         align-items: center;
-      }
-
-      .auth-buttons {
-        display: grid;
-        gap: 10px;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      }
-
-      .auth-btn {
-        appearance: none;
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
         background: #fff;
         color: var(--ink);
-        padding: 10px 14px;
-        border-radius: 10px;
         font-weight: 600;
-        cursor: pointer;
-        font-size: 0.95rem;
+        text-decoration: none;
+        font-size: 0.85rem;
         transition: transform 160ms ease, box-shadow 160ms ease;
       }
 
-      .auth-btn:hover {
+      .profile-link:hover {
         transform: translateY(-1px);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
       }
 
-      .auth-btn:disabled {
-        cursor: not-allowed;
-        opacity: 0.6;
-        box-shadow: none;
-        transform: none;
-      }
-
-      .auth-hint {
+      .board-header .meta {
+        font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
         font-size: 0.85rem;
         color: var(--muted);
-      }
-
-      .name-form {
-        display: grid;
-        gap: 8px;
-      }
-
-      .name-label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: var(--muted);
-      }
-
-      .name-row {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 10px;
-      }
-
-      .name-input {
-        border: 1px solid rgba(0, 0, 0, 0.12);
-        border-radius: 10px;
-        padding: 10px 12px;
-        font-size: 0.95rem;
-        font-family: "Space Grotesk", system-ui, sans-serif;
-      }
-
-      .name-save {
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        background: #fff;
-        padding: 10px 14px;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        font-size: 0.95rem;
-      }
-
-      .name-save:disabled {
-        cursor: not-allowed;
-        opacity: 0.6;
       }
 
       .leaderboard {
@@ -193,14 +120,6 @@
         background: #f7f6f2;
         border: 1px solid rgba(0, 0, 0, 0.08);
         transition: transform 180ms ease, box-shadow 180ms ease;
-      }
-
-      .row.row--admin {
-        grid-template-columns: 54px 1fr auto auto;
-      }
-
-      .row.row--banned {
-        opacity: 0.55;
       }
 
       .row:nth-child(odd) {
@@ -294,35 +213,12 @@
         <p>Have fun on this leaderboard!</p>
       </header>
 
-      <section class="auth-card">
-        <div class="auth-header">
-          <div>
-            <strong>Sign in to claim your name</strong>
-            <div id="auth-status" class="status">Not signed in.</div>
-          </div>
-          <button id="sign-out" class="auth-btn" type="button" hidden>Sign out</button>
-        </div>
-        <div class="auth-buttons" id="auth-controls">
-          <button class="auth-btn" type="button" data-provider="google">Continue with Google</button>
-          <button class="auth-btn" type="button" data-provider="discord">Continue with Discord</button>
-          <button class="auth-btn" type="button" data-provider="github">Continue with GitHub</button>
-        </div>
-        <div class="name-form">
-          <label class="name-label" for="display-name">Display name</label>
-          <div class="name-row">
-            <input id="display-name" class="name-input" type="text" placeholder="Choose your name" maxlength="24" />
-            <button id="save-name" class="name-save" type="button">Save name</button>
-          </div>
-          <div id="name-status" class="auth-hint">Sign in to choose a name.</div>
-        </div>
-        <div class="auth-hint">Auth opens in a new tab because this page runs inside an iframe.</div>
-      </section>
-
       <section class="board">
         <div class="board-header">
           <div>
             <strong>Top learners</strong>
           </div>
+          <a id="manage-profile" class="profile-link" href="login.html" target="_blank" rel="noopener">Manage profile</a>
           <div class="meta" id="last-updated">Waiting for data...</div>
         </div>
         <div id="status" class="status">Loading leaderboard...</div>
@@ -336,8 +232,6 @@
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eWlqdG1ibm5mam55d2FqYmNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjkxMzUsImV4cCI6MjA4OTAwNTEzNX0.FRs1eH7rAZ_EW2dyHtpKfKKsoe5nHQHvSUmZv5TeJCE';
       const LEADERBOARD_TABLE = 'leaderboard';
       const PAGE_SIZE = 500;
-      const AUTH_REDIRECT = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-callback.html';
-      const AUTH_START = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-start.html';
 
       const fallbackParts = {
         adj: [
@@ -374,118 +268,11 @@
       const leaderboardEl = document.getElementById('leaderboard');
       const statusEl = document.getElementById('status');
       const updatedEl = document.getElementById('last-updated');
-      const authStatusEl = document.getElementById('auth-status');
-      const authControlsEl = document.getElementById('auth-controls');
-      const signOutBtn = document.getElementById('sign-out');
-      const nameInputEl = document.getElementById('display-name');
-      const saveNameBtn = document.getElementById('save-name');
-      const nameStatusEl = document.getElementById('name-status');
       const linkedClientId = new URLSearchParams(window.location.search).get('cid');
-      let currentSession = null;
-      let isAdmin = false;
-
-      const setNameControls = (enabled) => {
-        if (!nameInputEl || !saveNameBtn) return;
-        nameInputEl.disabled = !enabled;
-        saveNameBtn.disabled = !enabled;
-      };
-
-      const normalizeName = (value) => value.trim().replace(/\s+/g, ' ');
-
-      const loadLinkedName = async () => {
-        if (!supabaseClient || !linkedClientId || !nameInputEl) return;
-        const { data, error } = await supabaseClient
-          .from(LEADERBOARD_TABLE)
-          .select('name')
-          .eq('client_id', linkedClientId)
-          .limit(1);
-
-        if (!error && data && data[0] && data[0].name) {
-          nameInputEl.value = data[0].name;
-        }
-      };
-
-      const setNameUi = async (session) => {
-        if (!nameStatusEl) return;
-
-        if (!supabaseClient) {
-          nameStatusEl.textContent = 'Supabase is not configured yet.';
-          setNameControls(false);
-          return;
-        }
-
-        if (!session) {
-          nameStatusEl.textContent = 'Sign in to choose a name.';
-          setNameControls(false);
-          return;
-        }
-
-        if (!linkedClientId) {
-          nameStatusEl.textContent = 'Open the leaderboard from the extension to link your account.';
-          setNameControls(false);
-          return;
-        }
-
-        nameStatusEl.textContent = 'Choose a display name (3-24 characters).';
-        setNameControls(true);
-        if (!nameInputEl.dataset.loaded) {
-          await loadLinkedName();
-          nameInputEl.dataset.loaded = 'true';
-        }
-      };
-
-      const setAuthUi = (session) => {
-        currentSession = session;
-        if (!authStatusEl) return;
-
-        if (!supabaseClient) {
-          authStatusEl.textContent = 'Supabase is not configured yet.';
-          if (authControlsEl) {
-            authControlsEl.querySelectorAll('button').forEach((btn) => {
-              btn.disabled = true;
-            });
-          }
-          if (signOutBtn) {
-            signOutBtn.hidden = true;
-          }
-          return;
-        }
-
-        if (session && session.user) {
-          const meta = session.user.user_metadata || {};
-          const name = meta.full_name || meta.user_name || session.user.email || 'Signed in';
-          authStatusEl.textContent = `Signed in as ${name}.`;
-          if (signOutBtn) {
-            signOutBtn.hidden = false;
-          }
-        } else {
-          authStatusEl.textContent = 'Not signed in.';
-          if (signOutBtn) {
-            signOutBtn.hidden = true;
-          }
-        }
-
-        setNameUi(session);
-      };
-
-      const startOAuth = (provider) => {
-        if (!supabaseClient) {
-          setAuthUi(null);
-          return;
-        }
-
-        const params = new URLSearchParams({ provider });
-        if (linkedClientId) {
-          params.set('cid', linkedClientId);
-        }
-        params.set('redirect', AUTH_REDIRECT);
-
-        const authUrl = `${AUTH_START}?${params.toString()}`;
-        const authWindow = window.open(authUrl, '_blank', 'width=520,height=720');
-        if (!authWindow) {
-          window.location.href = authUrl;
-        }
-      };
+      const profileLink = document.getElementById('manage-profile');
+      if (profileLink && linkedClientId) {
+        profileLink.href = `login.html?cid=${encodeURIComponent(linkedClientId)}`;
+      }
       const randomName = () => {
         const adj = fallbackParts.adj[Math.floor(Math.random() * fallbackParts.adj.length)];
         const noun = fallbackParts.noun[Math.floor(Math.random() * fallbackParts.noun.length)];
@@ -493,12 +280,11 @@
         return `${adj}${noun}${suffix}`;
       };
 
-      const render = (rows) => {
-        leaderboardEl.innerHTML = '';
-        rows.forEach((row, index) => {
-          const item = document.createElement('div');
-          const isBanned = row.banned === true;
-          item.className = `row${isAdmin ? ' row--admin' : ''}${isBanned ? ' row--banned' : ''}`;
+        const render = (rows) => {
+          leaderboardEl.innerHTML = '';
+          rows.forEach((row, index) => {
+            const item = document.createElement('div');
+            item.className = 'row';
 
           const rank = document.createElement('div');
           rank.className = 'rank';
@@ -517,21 +303,9 @@
           item.appendChild(name);
           item.appendChild(level);
 
-          if (isAdmin) {
-            const banBtn = document.createElement('button');
-            banBtn.type = 'button';
-            banBtn.className = `ban-btn ${isBanned ? 'unban' : 'ban'}`;
-            banBtn.textContent = isBanned ? 'Unban' : 'Ban';
-            banBtn.addEventListener('click', (event) => {
-              event.stopPropagation();
-              toggleBan(row.client_id, !isBanned);
-            });
-            item.appendChild(banBtn);
-          }
-
-          leaderboardEl.appendChild(item);
-        });
-      };
+            leaderboardEl.appendChild(item);
+          });
+        };
 
       const renderFallback = () => {
         const rows = Array.from({ length: 10 }, () => ({
@@ -549,9 +323,9 @@
         let from = 0;
 
         while (true) {
-          const { data, error } = await client
-            .from(LEADERBOARD_TABLE)
-            .select('client_id, name, xp, updated_at, banned')
+            const { data, error } = await client
+              .from(LEADERBOARD_TABLE)
+              .select('client_id, name, xp, updated_at')
             .order('xp', { ascending: false })
             .order('updated_at', { ascending: false })
             .order('client_id', { ascending: true })
@@ -598,190 +372,7 @@
         updatedEl.textContent = latest ? `Last update: ${new Date(latest).toLocaleString()}` : 'Waiting for updates...';
       };
 
-      const checkAdmin = async (session) => {
-        if (!supabaseClient || !session) {
-          isAdmin = false;
-          return;
-        }
-
-        const { data, error } = await supabaseClient
-          .from('leaderboard_admins')
-          .select('user_id')
-          .eq('user_id', session.user.id)
-          .limit(1);
-
-        isAdmin = !!(data && data.length && !error);
-      };
-
-      const toggleBan = async (clientId, banned) => {
-        if (!supabaseClient) return;
-        const now = new Date().toISOString();
-        const { error } = await supabaseClient
-          .from(LEADERBOARD_TABLE)
-          .update({ banned, banned_at: banned ? now : null })
-          .eq('client_id', clientId);
-
-        if (error) {
-          statusEl.textContent = 'Could not update ban status.';
-          return;
-        }
-
-        loadLeaderboard();
-      };
-
       loadLeaderboard();
-
-      if (supabaseClient) {
-        const loadCachedSession = async () => {
-          try {
-            const cached = sessionStorage.getItem('ssa_auth_session');
-            if (!cached) {
-              setAuthUi(null);
-              return;
-            }
-
-            const parsed = JSON.parse(cached);
-            if (!parsed?.access_token || !parsed?.refresh_token) {
-              setAuthUi(null);
-              return;
-            }
-
-            const { data, error } = await supabaseClient.auth.setSession({
-              access_token: parsed.access_token,
-              refresh_token: parsed.refresh_token
-            });
-
-            if (error) {
-              setAuthUi(null);
-              return;
-            }
-
-            const session = data?.session || null;
-            setAuthUi(session);
-            await checkAdmin(session);
-          } catch {
-            setAuthUi(null);
-          }
-        };
-
-        loadCachedSession();
-
-        supabaseClient.auth.onAuthStateChange((_event, session) => {
-          setAuthUi(session);
-          checkAdmin(session).then(loadLeaderboard);
-        });
-      } else {
-        setAuthUi(null);
-      }
-
-      if (authControlsEl) {
-        authControlsEl.querySelectorAll('button[data-provider]').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            startOAuth(btn.dataset.provider);
-          });
-        });
-      }
-
-      if (signOutBtn) {
-        signOutBtn.addEventListener('click', async () => {
-          if (!supabaseClient) return;
-          try {
-            sessionStorage.removeItem('ssa_auth_session');
-          } catch {}
-          await supabaseClient.auth.signOut();
-        });
-      }
-
-      if (saveNameBtn) {
-        saveNameBtn.addEventListener('click', async () => {
-          if (!supabaseClient || !currentSession) {
-            if (nameStatusEl) {
-              nameStatusEl.textContent = 'Sign in to choose a name.';
-            }
-            return;
-          }
-
-          if (!linkedClientId) {
-            if (nameStatusEl) {
-              nameStatusEl.textContent = 'Open the leaderboard from the extension to link your account.';
-            }
-            return;
-          }
-
-          const cleaned = normalizeName(nameInputEl.value || '');
-          if (cleaned.length < 3 || cleaned.length > 24) {
-            nameStatusEl.textContent = 'Name must be 3-24 characters.';
-            return;
-          }
-
-          saveNameBtn.disabled = true;
-          const now = new Date().toISOString();
-          const { data: updated, error: updateError } = await supabaseClient
-            .from(LEADERBOARD_TABLE)
-            .update({ name: cleaned, updated_at: now })
-            .eq('client_id', linkedClientId)
-            .select('client_id');
-
-          if (updateError) {
-            nameStatusEl.textContent = 'Could not save name.';
-            saveNameBtn.disabled = false;
-            return;
-          }
-
-          if (!updated || updated.length === 0) {
-            const { error: upsertError } = await supabaseClient
-              .from(LEADERBOARD_TABLE)
-              .upsert({
-                client_id: linkedClientId,
-                name: cleaned,
-                xp: 0,
-                level: 0,
-                updated_at: now
-              });
-
-            if (upsertError) {
-              nameStatusEl.textContent = 'Could not save name.';
-              saveNameBtn.disabled = false;
-              return;
-            }
-          }
-
-          nameStatusEl.textContent = 'Name updated.';
-          saveNameBtn.disabled = false;
-          loadLeaderboard();
-        });
-      }
-
-      window.addEventListener('message', async (event) => {
-        if (event.origin !== window.location.origin) return;
-        if (!event.data || event.data.type !== 'SSA_AUTH') return;
-        if (!supabaseClient) return;
-
-        const { access_token, refresh_token } = event.data;
-        if (!access_token || !refresh_token) {
-          setAuthUi(null);
-          return;
-        }
-
-        const { data, error } = await supabaseClient.auth.setSession({
-          access_token,
-          refresh_token
-        });
-
-        if (error) {
-          setAuthUi(null);
-          return;
-        }
-
-        try {
-          sessionStorage.setItem('ssa_auth_session', JSON.stringify({ access_token, refresh_token }));
-        } catch {}
-
-        const session = data?.session || null;
-        setAuthUi(session);
-        await checkAdmin(session);
-        loadLeaderboard();
-      });
     </script>
   </body>
 </html>
