@@ -42,29 +42,40 @@
       <p id="status"></p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-      const SUPABASE_URL = 'https://gyyijtmbnnfjnywajbcg.supabase.co';
-      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eWlqdG1ibm5mam55d2FqYmNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjkxMzUsImV4cCI6MjA4OTAwNTEzNX0.FRs1eH7rAZ_EW2dyHtpKfKKsoe5nHQHvSUmZv5TeJCE';
       const statusEl = document.getElementById('status');
 
-      const finish = async () => {
-        try {
-          const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-          const { error } = await client.auth.exchangeCodeForSession(window.location.href);
+      const parseParams = (source) => {
+        const params = new URLSearchParams(source.replace(/^#/, ''));
+        const entries = {};
+        params.forEach((value, key) => {
+          entries[key] = value;
+        });
+        return entries;
+      };
 
-          if (error) {
-            statusEl.textContent = 'Sign-in failed. Please try again.';
-            return;
-          }
+      const finish = () => {
+        const hashParams = parseParams(window.location.hash || '');
+        const accessToken = hashParams.access_token;
+        const refreshToken = hashParams.refresh_token;
 
-          statusEl.textContent = 'Signed in successfully. You can return to the leaderboard.';
-          setTimeout(() => {
-            window.close();
-          }, 500);
-        } catch (err) {
+        if (!accessToken || !refreshToken) {
           statusEl.textContent = 'Sign-in failed. Please try again.';
+          return;
         }
+
+        if (window.opener) {
+          window.opener.postMessage({
+            type: 'SSA_AUTH',
+            access_token: accessToken,
+            refresh_token: refreshToken
+          }, window.location.origin);
+        }
+
+        statusEl.textContent = 'Signed in successfully. You can return to the leaderboard.';
+        setTimeout(() => {
+          window.close();
+        }, 500);
       };
 
       finish();

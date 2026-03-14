@@ -330,7 +330,14 @@
         !SUPABASE_ANON_KEY.includes('YOUR_');
 
       const supabaseClient = isConfigured()
-        ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+              flowType: 'implicit',
+              persistSession: false,
+              autoRefreshToken: false,
+              detectSessionInUrl: false
+            }
+          })
         : null;
 
       const leaderboardEl = document.getElementById('leaderboard');
@@ -554,9 +561,37 @@
       loadLeaderboard();
 
       if (supabaseClient) {
-        supabaseClient.auth.getSession().then(({ data }) => {
-          setAuthUi(data?.session || null);
-        });
+        const loadCachedSession = async () => {
+          try {
+            const cached = sessionStorage.getItem('ssa_auth_session');
+            if (!cached) {
+              setAuthUi(null);
+              return;
+            }
+
+            const parsed = JSON.parse(cached);
+            if (!parsed?.access_token || !parsed?.refresh_token) {
+              setAuthUi(null);
+              return;
+            }
+
+            const { data, error } = await supabaseClient.auth.setSession({
+              access_token: parsed.access_token,
+              refresh_token: parsed.refresh_token
+            });
+
+            if (error) {
+              setAuthUi(null);
+              return;
+            }
+
+            setAuthUi(data?.session || null);
+          } catch {
+            setAuthUi(null);
+          }
+        };
+
+        loadCachedSession();
 
         supabaseClient.auth.onAuthStateChange((_event, session) => {
           setAuthUi(session);
@@ -576,6 +611,9 @@
       if (signOutBtn) {
         signOutBtn.addEventListener('click', async () => {
           if (!supabaseClient) return;
+          try {
+            sessionStorage.removeItem('ssa_auth_session');
+          } catch {}
           await supabaseClient.auth.signOut();
         });
       }
@@ -639,6 +677,34 @@
           loadLeaderboard();
         });
       }
+
+      window.addEventListener('message', async (event) => {
+        if (event.origin !== window.location.origin) return;
+        if (!event.data || event.data.type !== 'SSA_AUTH') return;
+        if (!supabaseClient) return;
+
+        const { access_token, refresh_token } = event.data;
+        if (!access_token || !refresh_token) {
+          setAuthUi(null);
+          return;
+        }
+
+        const { data, error } = await supabaseClient.auth.setSession({
+          access_token,
+          refresh_token
+        });
+
+        if (error) {
+          setAuthUi(null);
+          return;
+        }
+
+        try {
+          sessionStorage.setItem('ssa_auth_session', JSON.stringify({ access_token, refresh_token }));
+        } catch {}
+
+        setAuthUi(data?.session || null);
+      });
     </script>
   </body>
 </html>
