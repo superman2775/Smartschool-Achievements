@@ -998,7 +998,7 @@ Author: @superman2775 +@broodje565
 
           function buildToast(data) {
             const toast = document.createElement('div');
-            toast.className = 'ssa-toast';
+            toast.className = 'ssa-toast notifs-toaster__toast modern-ui';
             toast.style.background = '#ffffff';
             toast.style.border = '1px solid rgba(0,0,0,0.08)';
             toast.style.borderLeft = `4px solid ${typeColor(data.type)}`;
