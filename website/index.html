@@ -335,11 +335,18 @@
           .eq('client_id', linkedClientId)
           .limit(1);
 
-        if (error || !data || !data[0]) {
+        if (!error && data && data[0]) {
+          if (data[0].banned === true) {
+            showBannedScreen();
+            return true;
+          }
           return false;
         }
 
-        if (data[0].banned === true) {
+        const { data: rpcData, error: rpcError } = await supabaseClient
+          .rpc('is_client_banned', { p_client_id: linkedClientId });
+
+        if (!rpcError && rpcData === true) {
           showBannedScreen();
           return true;
         }

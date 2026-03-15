@@ -413,6 +413,28 @@
         banCard.hidden = !isBanned;
       };
 
+      const fetchBanStatus = async () => {
+        if (!supabaseClient || !linkedClientId) return false;
+        const { data, error } = await supabaseClient
+          .from(LEADERBOARD_TABLE)
+          .select('banned')
+          .eq('client_id', linkedClientId)
+          .limit(1);
+
+        if (!error && data && data[0]) {
+          return data[0].banned === true;
+        }
+
+        const { data: rpcData, error: rpcError } = await supabaseClient
+          .rpc('is_client_banned', { p_client_id: linkedClientId });
+
+        if (!rpcError) {
+          return rpcData === true;
+        }
+
+        return false;
+      };
+
       const loadLinkedName = async () => {
         if (!supabaseClient || !linkedClientId || !nameInputEl) return;
         const { data, error } = await supabaseClient
@@ -427,7 +449,11 @@
           if (data[0].name) {
             nameInputEl.value = data[0].name;
           }
+          return;
         }
+
+        linkedBanned = await fetchBanStatus();
+        setBanUi(linkedBanned);
       };
 
       const setNameUi = async (session) => {
