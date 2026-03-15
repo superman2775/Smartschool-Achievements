@@ -168,6 +168,31 @@
         width: fit-content;
       }
 
+      .ban-card {
+        background: #fff5f5;
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 22px 24px;
+        display: grid;
+        gap: 10px;
+        border: 1px solid rgba(198, 40, 40, 0.3);
+      }
+
+      .ban-card[hidden] {
+        display: none;
+      }
+
+      .ban-title {
+        font-weight: 700;
+        color: #b71c1c;
+        font-size: 1.1rem;
+      }
+
+      .ban-text {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
       .admin-card {
         background: var(--card);
         border-radius: 18px;
@@ -296,6 +321,13 @@
         <a href="privacy-policy.html" style="justify-self: start; font-size: 0.85rem; color: var(--muted);">Privacy Policy</a>
       </section>
 
+      <section id="ban-card" class="ban-card" hidden>
+        <div class="ban-title">Access blocked</div>
+        <div class="ban-text">
+          This leaderboard profile has been banned. If you think this is a mistake, contact an admin.
+        </div>
+      </section>
+
       <section id="admin-card" class="admin-card" hidden>
         <div class="auth-header">
           <div>
@@ -356,12 +388,14 @@
       const nameInputEl = document.getElementById('display-name');
       const saveNameBtn = document.getElementById('save-name');
       const nameStatusEl = document.getElementById('name-status');
+      const banCard = document.getElementById('ban-card');
       const adminCard = document.getElementById('admin-card');
       const adminStatusEl = document.getElementById('admin-status');
       const adminListEl = document.getElementById('admin-list');
       const adminRefreshBtn = document.getElementById('admin-refresh');
       const adminFilterInput = document.getElementById('admin-filter');
       let currentSession = null;
+      let linkedBanned = false;
       let adminRows = [];
       let isAdminUser = false;
       let adminUserId = null;
@@ -374,16 +408,25 @@
 
       const normalizeName = (value) => value.trim().replace(/\s+/g, ' ');
 
+      const setBanUi = (isBanned) => {
+        if (!banCard) return;
+        banCard.hidden = !isBanned;
+      };
+
       const loadLinkedName = async () => {
         if (!supabaseClient || !linkedClientId || !nameInputEl) return;
         const { data, error } = await supabaseClient
           .from(LEADERBOARD_TABLE)
-          .select('name')
+          .select('name, banned')
           .eq('client_id', linkedClientId)
           .limit(1);
 
-        if (!error && data && data[0] && data[0].name) {
-          nameInputEl.value = data[0].name;
+        if (!error && data && data[0]) {
+          linkedBanned = data[0].banned === true;
+          setBanUi(linkedBanned);
+          if (data[0].name) {
+            nameInputEl.value = data[0].name;
+          }
         }
       };
 
@@ -392,28 +435,40 @@
 
         if (!supabaseClient) {
           nameStatusEl.textContent = 'Supabase is not configured yet.';
+          setBanUi(false);
           setNameControls(false);
           return;
         }
 
         if (!session) {
           nameStatusEl.textContent = 'Sign in to choose a name.';
+          setBanUi(false);
           setNameControls(false);
           return;
         }
 
         if (!linkedClientId) {
           nameStatusEl.textContent = 'Open the leaderboard from the extension to link your account.';
+          setBanUi(false);
+          setNameControls(false);
+          return;
+        }
+
+        if (!nameInputEl.dataset.loaded) {
+          await loadLinkedName();
+          nameInputEl.dataset.loaded = 'true';
+        }
+
+        if (linkedBanned) {
+          nameStatusEl.textContent = 'This profile is banned.';
+          setBanUi(true);
           setNameControls(false);
           return;
         }
 
         nameStatusEl.textContent = 'Choose a display name (3-24 characters).';
+        setBanUi(false);
         setNameControls(true);
-        if (!nameInputEl.dataset.loaded) {
-          await loadLinkedName();
-          nameInputEl.dataset.loaded = 'true';
-        }
       };
 
       const formatAdminMeta = (row) => {
@@ -627,6 +682,9 @@
 
         if (!supabaseClient) {
           authStatusEl.textContent = 'Supabase is not configured yet.';
+          if (banCard) {
+            banCard.hidden = true;
+          }
           if (adminCard) {
             adminCard.hidden = true;
           }
