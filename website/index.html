@@ -301,7 +301,14 @@
       const leaderboardEl = document.getElementById('leaderboard');
       const statusEl = document.getElementById('status');
       const updatedEl = document.getElementById('last-updated');
-      const linkedClientId = new URLSearchParams(window.location.search).get('cid');
+      let linkedClientId = new URLSearchParams(window.location.search).get('cid');
+      const storedClientId = localStorage.getItem('ssaLeaderboardClientId');
+      if (!linkedClientId && storedClientId) {
+        linkedClientId = storedClientId;
+      }
+      if (linkedClientId) {
+        localStorage.setItem('ssaLeaderboardClientId', linkedClientId);
+      }
       const profileLink = document.getElementById('manage-profile');
       if (profileLink && linkedClientId) {
         profileLink.href = `login.html?cid=${encodeURIComponent(linkedClientId)}`;

@@ -359,7 +359,14 @@
       const AUTH_REDIRECT = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-callback.html';
       const AUTH_START = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-start.html';
 
-      const linkedClientId = new URLSearchParams(window.location.search).get('cid');
+      let linkedClientId = new URLSearchParams(window.location.search).get('cid');
+      const storedClientId = localStorage.getItem('ssaLeaderboardClientId');
+      if (!linkedClientId && storedClientId) {
+        linkedClientId = storedClientId;
+      }
+      if (linkedClientId) {
+        localStorage.setItem('ssaLeaderboardClientId', linkedClientId);
+      }
       const backLink = document.getElementById('back-link');
       if (backLink && linkedClientId) {
         backLink.href = `index.html?cid=${encodeURIComponent(linkedClientId)}`;
@@ -435,25 +442,31 @@
         return false;
       };
 
-      const loadLinkedName = async () => {
-        if (!supabaseClient || !linkedClientId || !nameInputEl) return;
-        const { data, error } = await supabaseClient
-          .from(LEADERBOARD_TABLE)
-          .select('name, banned')
-          .eq('client_id', linkedClientId)
-          .limit(1);
-
-        if (!error && data && data[0]) {
-          linkedBanned = data[0].banned === true;
-          setBanUi(linkedBanned);
-          if (data[0].name) {
-            nameInputEl.value = data[0].name;
-          }
-          return;
+      const refreshBanStatus = async () => {
+        if (!supabaseClient || !linkedClientId) {
+          linkedBanned = false;
+          setBanUi(false);
+          return false;
         }
 
         linkedBanned = await fetchBanStatus();
         setBanUi(linkedBanned);
+        return linkedBanned;
+      };
+
+      const loadLinkedName = async () => {
+        if (!supabaseClient || !linkedClientId || !nameInputEl) return;
+        const { data, error } = await supabaseClient
+          .from(LEADERBOARD_TABLE)
+          .select('name')
+          .eq('client_id', linkedClientId)
+          .limit(1);
+
+        if (!error && data && data[0]) {
+          if (data[0].name) {
+            nameInputEl.value = data[0].name;
+          }
+        }
       };
 
       const setNameUi = async (session) => {
@@ -466,15 +479,22 @@
           return;
         }
 
-        if (!session) {
-          nameStatusEl.textContent = 'Sign in to choose a name.';
+        if (!linkedClientId) {
+          nameStatusEl.textContent = 'Open the leaderboard from the extension to link your account.';
           setBanUi(false);
           setNameControls(false);
           return;
         }
 
-        if (!linkedClientId) {
-          nameStatusEl.textContent = 'Open the leaderboard from the extension to link your account.';
+        await refreshBanStatus();
+
+        if (!session) {
+          if (linkedBanned) {
+            nameStatusEl.textContent = 'This profile is banned.';
+            setNameControls(false);
+            return;
+          }
+          nameStatusEl.textContent = 'Sign in to choose a name.';
           setBanUi(false);
           setNameControls(false);
           return;
