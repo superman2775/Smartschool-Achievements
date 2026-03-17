@@ -62,33 +62,50 @@ Author: @superman2775
           : Math.random().toString(36).slice(2) + Date.now().toString(36));
 
       const name = res.ssaLeaderboardName || createLeaderboardName();
+      const baseHeaders = {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      };
+      const encodedClientId = encodeURIComponent(clientId);
+      const lookupUrl = `${SUPABASE_URL}/rest/v1/${LEADERBOARD_TABLE}?select=name&client_id=eq.${encodedClientId}&limit=1`;
 
-      fetch(`${SUPABASE_URL}/rest/v1/${LEADERBOARD_TABLE}?on_conflict=client_id`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'Prefer': 'resolution=merge-duplicates'
-        },
-        body: JSON.stringify({
-          client_id: clientId,
-          name,
-          xp,
-          level,
-          updated_at: new Date().toISOString()
-        })
-      }).then((resp) => {
-        if (!resp.ok) throw new Error(`Leaderboard sync failed: ${resp.status}`);
-        chrome.storage.local.set({
-          ssaLeaderboardClientId: clientId,
-          ssaLeaderboardName: name,
-          ssaLeaderboardLastSync: Date.now(),
-          ssaLeaderboardLastXp: xp
+      const pushScore = (finalName) => {
+        fetch(`${SUPABASE_URL}/rest/v1/${LEADERBOARD_TABLE}?on_conflict=client_id`, {
+          method: 'POST',
+          headers: {
+            ...baseHeaders,
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify({
+            client_id: clientId,
+            name: finalName,
+            xp,
+            level,
+            updated_at: new Date().toISOString()
+          })
+        }).then((resp) => {
+          if (!resp.ok) throw new Error(`Leaderboard sync failed: ${resp.status}`);
+          chrome.storage.local.set({
+            ssaLeaderboardClientId: clientId,
+            ssaLeaderboardName: finalName,
+            ssaLeaderboardLastSync: Date.now(),
+            ssaLeaderboardLastXp: xp
+          });
+        }).catch((err) => {
+          console.warn('[Achievements] Leaderboard sync failed', err);
         });
-      }).catch((err) => {
-        console.warn('[Achievements] Leaderboard sync failed', err);
-      });
+      };
+
+      fetch(lookupUrl, { headers: baseHeaders })
+        .then((resp) => (resp.ok ? resp.json() : null))
+        .then((data) => {
+          const existingName = data && data[0] && data[0].name;
+          pushScore(existingName || name);
+        })
+        .catch(() => {
+          pushScore(name);
+        });
     });
   }
 
