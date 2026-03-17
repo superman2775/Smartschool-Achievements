@@ -193,6 +193,25 @@
         font-size: 0.95rem;
       }
 
+      .ban-link {
+        display: inline-flex;
+        justify-self: start;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(198, 40, 40, 0.35);
+        background: #fff;
+        color: #b71c1c;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .ban-meta {
+        font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
       .admin-card {
         background: var(--card);
         border-radius: 18px;
@@ -258,6 +277,25 @@
         display: inline-flex;
         gap: 8px;
         align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .ban-select {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 8px;
+        padding: 6px 8px;
+        font-size: 0.85rem;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        background: #fff;
+      }
+
+      .ban-reason {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 8px;
+        padding: 6px 8px;
+        font-size: 0.85rem;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        min-width: 180px;
       }
 
       .ban-btn {
@@ -316,6 +354,7 @@
             <button id="save-name" class="name-save" type="button">Save name</button>
           </div>
           <div id="name-status" class="auth-hint">Sign in to choose a name.</div>
+          <div class="auth-hint">Bad or offensive names can result in a ban.</div>
         </div>
         <p class="auth-hint">By logging in, you agree with our privacy policy.</p>
         <a href="privacy-policy.html" style="justify-self: start; font-size: 0.85rem; color: var(--muted);">Privacy Policy</a>
@@ -326,6 +365,11 @@
         <div class="ban-text">
           This leaderboard profile has been banned. If you think this is a mistake, contact an admin.
         </div>
+        <div id="ban-reason" class="ban-text"></div>
+        <div id="ban-until" class="ban-meta"></div>
+        <a id="ban-appeal" class="ban-link" href="#" target="_blank" rel="noreferrer">
+          Appeal on Discord
+        </a>
       </section>
 
       <section id="admin-card" class="admin-card" hidden>
@@ -356,8 +400,16 @@
       const LEADERBOARD_TABLE = 'leaderboard';
       const ADMIN_TABLE = 'leaderboard_admins';
       const ADMIN_PAGE_SIZE = 500000;
+      const DISCORD_APPEAL_URL = 'https://discord.gg/upmbz82Ffb';
       const AUTH_REDIRECT = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-callback.html';
       const AUTH_START = 'https://superman2775.github.io/Smartschool-Achievements/website/auth-start.html';
+      const BAN_PRESETS = [
+        { label: '1 day', value: 1 * 24 * 60 * 60 * 1000 },
+        { label: '7 days', value: 7 * 24 * 60 * 60 * 1000 },
+        { label: '1 month', value: 30 * 24 * 60 * 60 * 1000 },
+        { label: '6 months', value: 182 * 24 * 60 * 60 * 1000 },
+        { label: 'Forever', value: null }
+      ];
 
       let linkedClientId = new URLSearchParams(window.location.search).get('cid');
       const storedClientId = localStorage.getItem('ssaLeaderboardClientId');
@@ -396,6 +448,9 @@
       const saveNameBtn = document.getElementById('save-name');
       const nameStatusEl = document.getElementById('name-status');
       const banCard = document.getElementById('ban-card');
+      const banReasonEl = document.getElementById('ban-reason');
+      const banUntilEl = document.getElementById('ban-until');
+      const banAppealLink = document.getElementById('ban-appeal');
       const adminCard = document.getElementById('admin-card');
       const adminStatusEl = document.getElementById('admin-status');
       const adminListEl = document.getElementById('admin-list');
@@ -403,6 +458,7 @@
       const adminFilterInput = document.getElementById('admin-filter');
       let currentSession = null;
       let linkedBanned = false;
+      let linkedBanInfo = { reason: '', until: null };
       let adminRows = [];
       let isAdminUser = false;
       let adminUserId = null;
@@ -415,41 +471,103 @@
 
       const normalizeName = (value) => value.trim().replace(/\s+/g, ' ');
 
+      const formatBanUntil = (value) => {
+        if (!value) return 'Ban duration: forever';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+          return 'Ban duration: unknown';
+        }
+        return `Ban lifted on: ${date.toLocaleString()}`;
+      };
+
       const setBanUi = (isBanned) => {
         if (!banCard) return;
         banCard.hidden = !isBanned;
+        if (banAppealLink) {
+          banAppealLink.href = DISCORD_APPEAL_URL;
+        }
+        if (!isBanned) {
+          if (banReasonEl) {
+            banReasonEl.textContent = '';
+          }
+          if (banUntilEl) {
+            banUntilEl.textContent = '';
+          }
+          return;
+        }
+        if (banReasonEl) {
+          banReasonEl.textContent = linkedBanInfo.reason
+            ? `Reason: ${linkedBanInfo.reason}`
+            : 'Reason: Not provided.';
+        }
+        if (banUntilEl) {
+          banUntilEl.textContent = formatBanUntil(linkedBanInfo.until);
+        }
+      };
+
+      const buildBanSelect = () => {
+        const select = document.createElement('select');
+        select.className = 'ban-select';
+        BAN_PRESETS.forEach((preset) => {
+          const option = document.createElement('option');
+          option.value = preset.value === null ? 'forever' : String(preset.value);
+          option.textContent = preset.label;
+          select.appendChild(option);
+        });
+        return select;
+      };
+
+      const getBanUntil = (value) => {
+        if (value === 'forever') return null;
+        const ms = Number(value);
+        if (!Number.isFinite(ms)) return null;
+        return new Date(Date.now() + ms).toISOString();
+      };
+
+      const normalizeBanInfo = (row) => {
+        const data = Array.isArray(row) ? row[0] : row;
+        return {
+          banned: data?.banned === true,
+          reason: data?.ban_reason ? String(data.ban_reason) : '',
+          until: data?.banned_until || null
+        };
       };
 
       const fetchBanStatus = async () => {
-        if (!supabaseClient || !linkedClientId) return false;
+        if (!supabaseClient || !linkedClientId) {
+          return { banned: false, reason: '', until: null };
+        }
         const { data, error } = await supabaseClient
           .from(LEADERBOARD_TABLE)
-          .select('banned')
+          .select('banned, banned_until, ban_reason')
           .eq('client_id', linkedClientId)
           .limit(1);
 
         if (!error && data && data[0]) {
-          return data[0].banned === true;
+          return normalizeBanInfo(data[0]);
         }
 
         const { data: rpcData, error: rpcError } = await supabaseClient
-          .rpc('is_client_banned', { p_client_id: linkedClientId });
+          .rpc('get_client_ban', { p_client_id: linkedClientId });
 
         if (!rpcError) {
-          return rpcData === true;
+          return normalizeBanInfo(rpcData);
         }
 
-        return false;
+        return { banned: false, reason: '', until: null };
       };
 
       const refreshBanStatus = async () => {
         if (!supabaseClient || !linkedClientId) {
           linkedBanned = false;
+          linkedBanInfo = { reason: '', until: null };
           setBanUi(false);
           return false;
         }
 
-        linkedBanned = await fetchBanStatus();
+        const info = await fetchBanStatus();
+        linkedBanned = info.banned;
+        linkedBanInfo = { reason: info.reason, until: info.until };
         setBanUi(linkedBanned);
         return linkedBanned;
       };
@@ -521,7 +639,14 @@
         const xpValue = typeof row.xp === 'number' ? row.xp : 0;
         const status = row.banned ? 'BANNED' : 'ACTIVE';
         const clientId = row.client_id || 'unknown-id';
-        return `XP ${xpValue} | ${clientId} | ${status}`;
+        let untilText = '';
+        if (row.banned && row.banned_until) {
+          const date = new Date(row.banned_until);
+          if (!Number.isNaN(date.getTime())) {
+            untilText = ` | until ${date.toLocaleDateString()}`;
+          }
+        }
+        return `XP ${xpValue} | ${clientId} | ${status}${untilText}`;
       };
 
       const filterAdminRows = (rows) => {
@@ -535,16 +660,20 @@
         });
       };
 
-      const toggleBan = async (row, button, metaEl) => {
+      const toggleBan = async (row, button, metaEl, presetEl, reasonEl) => {
         if (!supabaseClient || !button) return;
         const nextBanned = !row.banned;
         button.disabled = true;
         const now = new Date().toISOString();
+        const until = nextBanned ? getBanUntil(presetEl?.value || 'forever') : null;
+        const reasonValue = nextBanned ? (reasonEl?.value || '').trim() : '';
         const { error } = await supabaseClient
           .from(LEADERBOARD_TABLE)
           .update({
             banned: nextBanned,
             banned_at: nextBanned ? now : null,
+            banned_until: until,
+            ban_reason: reasonValue || null,
             updated_at: now
           })
           .eq('client_id', row.client_id);
@@ -558,6 +687,8 @@
         }
 
         row.banned = nextBanned;
+        row.banned_until = until;
+        row.ban_reason = reasonValue;
         button.textContent = row.banned ? 'Unban' : 'Ban';
         button.classList.toggle('ban', !row.banned);
         button.classList.toggle('unban', row.banned);
@@ -611,14 +742,27 @@
           const actions = document.createElement('div');
           actions.className = 'admin-actions';
 
+          const presetSelect = buildBanSelect();
+          if (row.banned && row.banned_until) {
+            presetSelect.value = 'forever';
+          }
+
+          const reasonInput = document.createElement('input');
+          reasonInput.type = 'text';
+          reasonInput.className = 'ban-reason';
+          reasonInput.placeholder = 'Reason';
+          reasonInput.value = row.ban_reason ? String(row.ban_reason) : '';
+
           const banBtn = document.createElement('button');
           banBtn.type = 'button';
           banBtn.className = `ban-btn ${row.banned ? 'unban' : 'ban'}`;
           banBtn.textContent = row.banned ? 'Unban' : 'Ban';
           banBtn.addEventListener('click', () => {
-            toggleBan(row, banBtn, metaEl);
+            toggleBan(row, banBtn, metaEl, presetSelect, reasonInput);
           });
 
+          actions.appendChild(presetSelect);
+          actions.appendChild(reasonInput);
           actions.appendChild(banBtn);
           item.appendChild(main);
           item.appendChild(actions);
@@ -633,7 +777,7 @@
         while (true) {
           const { data, error } = await supabaseClient
             .from(LEADERBOARD_TABLE)
-            .select('client_id, name, xp, banned, updated_at')
+            .select('client_id, name, xp, banned, banned_until, ban_reason, updated_at')
             .order('xp', { ascending: false })
             .order('updated_at', { ascending: false })
             .order('client_id', { ascending: true })

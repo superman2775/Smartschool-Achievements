@@ -265,6 +265,7 @@
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5eWlqdG1ibm5mam55d2FqYmNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjkxMzUsImV4cCI6MjA4OTAwNTEzNX0.FRs1eH7rAZ_EW2dyHtpKfKKsoe5nHQHvSUmZv5TeJCE';
       const LEADERBOARD_TABLE = 'leaderboard';
       const PAGE_SIZE = 50000;
+      const DISCORD_APPEAL_URL = 'https://discord.gg/upmbz82Ffb';
 
       const fallbackParts = {
         adj: [
@@ -315,8 +316,28 @@
       }
       const shellEl = document.querySelector('.shell');
 
-      const showBannedScreen = () => {
+      const normalizeBanInfo = (row) => {
+        const data = Array.isArray(row) ? row[0] : row;
+        return {
+          banned: data?.banned === true,
+          reason: data?.ban_reason ? String(data.ban_reason) : '',
+          until: data?.banned_until || null
+        };
+      };
+
+      const formatBanUntil = (value) => {
+        if (!value) return 'Ban duration: forever';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+          return 'Ban duration: unknown';
+        }
+        return `Ban lifted on: ${date.toLocaleString()}`;
+      };
+
+      const showBannedScreen = (info) => {
         if (document.getElementById('ban-screen')) return;
+        const reasonLine = info?.reason ? `Reason: ${info.reason}` : 'Reason: Not provided.';
+        const untilLine = formatBanUntil(info?.until);
         const screen = document.createElement('div');
         screen.id = 'ban-screen';
         screen.className = 'ban-screen';
@@ -326,6 +347,9 @@
             <div class="ban-text">
               This leaderboard profile has been banned. If you think this is a mistake, contact an admin.
             </div>
+            <div class="ban-text">${reasonLine}</div>
+            <div class="ban-text">${untilLine}</div>
+            <a class="profile-link" href="${DISCORD_APPEAL_URL}" target="_blank" rel="noreferrer">Appeal on Discord</a>
           </div>
         `;
         if (shellEl) {
@@ -338,26 +362,30 @@
         if (!supabaseClient || !linkedClientId) return false;
         const { data, error } = await supabaseClient
           .from(LEADERBOARD_TABLE)
-          .select('banned')
+          .select('banned, banned_until, ban_reason')
           .eq('client_id', linkedClientId)
           .limit(1);
 
         if (!error && data && data[0]) {
-          if (data[0].banned === true) {
-            showBannedScreen();
+          const info = normalizeBanInfo(data[0]);
+          if (info.banned) {
+            showBannedScreen(info);
             return true;
           }
           return false;
         }
 
         const { data: rpcData, error: rpcError } = await supabaseClient
-          .rpc('is_client_banned', { p_client_id: linkedClientId });
+          .rpc('get_client_ban', { p_client_id: linkedClientId });
 
-        if (!rpcError && rpcData === true) {
-          showBannedScreen();
-          return true;
+        if (!rpcError) {
+          const info = normalizeBanInfo(rpcData);
+          if (info.banned) {
+            showBannedScreen(info);
+            return true;
+          }
+          return false;
         }
-
         return false;
       };
       const randomName = () => {
