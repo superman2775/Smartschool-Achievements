@@ -154,6 +154,15 @@
         font-size: 1.1rem;
       }
 
+      .row.is-self {
+        border-color: rgba(245, 124, 0, 0.35);
+        background: #fff7ed;
+      }
+
+      .row.is-self .name {
+        color: #c25a00;
+      }
+
       .ban-btn {
         border: 1px solid rgba(0, 0, 0, 0.12);
         background: #fff;
@@ -397,11 +406,14 @@
         return `${adj}${noun}${suffix}`;
       };
 
-        const render = (rows) => {
-          leaderboardEl.innerHTML = '';
-          rows.forEach((row, index) => {
-            const item = document.createElement('div');
-            item.className = 'row';
+      const render = (rows) => {
+        leaderboardEl.innerHTML = '';
+        rows.forEach((row, index) => {
+          const item = document.createElement('div');
+          item.className = 'row';
+          if (linkedClientId && row.client_id === linkedClientId) {
+            item.classList.add('is-self');
+          }
 
           const rank = document.createElement('div');
           rank.className = 'rank';
