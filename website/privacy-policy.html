@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="nl">
   <head>
     <meta charset="utf-8" />
@@ -148,10 +148,16 @@
       <header>
         <span style="background: rgba(245,124,0,0.1); color: var(--accent); padding: 6px 12px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; width: fit-content; margin: 0 auto;">Privacybeleid</span>
         <h1>Privacybeleid</h1>
-        <p class="meta">Laatst bijgewerkt: 14 maart 2026</p>
+        <p class="meta">Laatst bijgewerkt: 18 maart 2026</p>
       </header>
 
       <section class="policy-card">
+        <section>
+          <h2>Wie wij zijn</h2>
+          <p>Smartschool Achievements is een niet-officiële browser-extensie en website die wordt beheerd door een onafhankelijke ontwikkelaar/ontwikkelteam en niet formeel verbonden is aan Smartschool of jouw onderwijsinstelling.</p>
+          <p>Voor vragen over dit privacybeleid of de manier waarop wij gegevens verwerken, kun je contact met ons opnemen via onze Discord-community (zie onder “Contact”). Indien wij op termijn een formele contactpersoon, juridische entiteit of postadres toevoegen, zullen wij dit in dit privacybeleid vermelden.</p>
+        </section>
+
         <section>
           <h2>Inleiding</h2>
           <p>Smartschool Achievements ("wij", "ons", "onze dienst") is een browser-extensie en bijhorende website die prestaties en achievements bijhoudt in de digitale leeromgeving Smartschool. Wij hechten groot belang aan de bescherming van jouw privacy en de vertrouwelijkheid van jouw gegevens.</p>
@@ -167,8 +173,11 @@
         </section>
 
         <section>
-          <h2>Gegevens die wij verzamelen</h2>
-          <p><strong>Extensie (lokaal in je browser):</strong> De extensie verzamelt en verwerkt geen persoonlijk identificeerbare informatie (PII) die direct naar jou als natuurlijke persoon herleidbaar is voor ons. De extensie volgt uitsluitend prestatiegegevens en gebruiksstatistieken binnen jouw Smartschool-gebruik, die lokaal in de browser worden opgeslagen, zoals onder meer:</p>
+          <h2>Welke gegevens wij verwerken</h2>
+          <p>We onderscheiden tussen gegevens die alleen lokaal in jouw browser worden verwerkt en gegevens die (optioneel) naar onze backend worden verstuurd.</p>
+
+          <p><strong>Extensie (lokaal in je browser)</strong></p>
+          <p>De extensie verzamelt en verwerkt geen namen, e-mailadressen, rijksregisternummers of andere direct identificerende persoonsgegevens voor ons als ontwikkelaar. De extensie volgt uitsluitend prestatiegegevens en gebruiksstatistieken binnen jouw Smartschool-gebruik, die lokaal in de browser worden opgeslagen, zoals onder meer:</p>
           <ul>
             <li>Aantal ingelogde sessies in Smartschool.</li>
             <li>Aantal voltooide opdrachten of activiteiten.</li>
@@ -176,107 +185,141 @@
             <li>Streak (aantal aaneengesloten dagen waarop je actief bent).</li>
             <li>Bezochte modules, vakken en resultaten (zover technisch nodig voor de achievement-logica).</li>
           </ul>
-          <p>Deze gegevens worden uitsluitend gebruikt om jouw persoonlijke voortgang en achievements in de extensie te tonen. Ze worden niet automatisch naar onze servers of derden verstuurd.</p>
-          <p><strong>Website / Leaderboard (optioneel):</strong> Als je er expliciet voor kiest om deel te nemen aan het openbare leaderboard, kan de extensie bepaalde gegevens naar onze backend (via Supabase) sturen. Het gaat hierbij om:</p>
+          <p>Deze gegevens zijn gekoppeld aan je gebruik van Smartschool in jouw browserprofiel, maar worden niet standaard naar onze servers gestuurd. Je onderwijsinstelling en Smartschool blijven verwerkingsverantwoordelijke voor de achterliggende schoolgegevens (zoals punten en opdrachten).</p>
+
+          <p><strong>Website / Leaderboard (optioneel)</strong></p>
+          <p>Als je er expliciet voor kiest om deel te nemen aan het openbare leaderboard, kan de extensie bepaalde gegevens naar onze backend (via Supabase) sturen. Het gaat hierbij om:</p>
           <ul>
-            <li>Een anonieme client-ID (een unieke identificatiecode die niet direct naar jouw echte identiteit herleidbaar is voor ons).</li>
-            <li>Een door jou gekozen weergavenaam (dit kan een pseudoniem zijn; we raden aan geen volledige naam of gevoelige informatie te gebruiken).</li>
-            <li>Je XP-score of prestatiepunten, zoals deze door de extensie worden berekend.</li>
+            <li><strong>Anonieme client-ID:</strong> een technische, random gegenereerde identificatiecode die we gebruiken om scores aan één profiel te koppelen, zonder dat wij weten wie je in het echt bent.</li>
+            <li><strong>Weergavenaam:</strong> een door jou gekozen naam (pseudoniem aanbevolen) die op het leaderboard wordt getoond. Gebruik bij voorkeur geen volledige naam of schoolnaam.</li>
+            <li><strong>XP-score / prestatiepunten:</strong> punten die jouw voortgang gamificeren en op het leaderboard geplaatst kunnen worden.</li>
           </ul>
-          <p>Wij slaan geen e-mailadressen, geen wachtwoorden, geen IP-adressen (anders dan wat technisch noodzakelijk is voor de hostingpartij) en geen andere direct identificeerbare persoonsgegevens op in het kader van het leaderboard.</p>
+          <p>Wij vragen en bewaren in dit kader geen e-mailadressen, wachtwoorden of bewust verzamelde IP-adressen voor eigen gebruik. Hostingpartijen zoals Supabase kunnen wel tijdelijk technische loggegevens verwerken (bijvoorbeeld IP en user-agent) voor beveiliging en foutdetectie; voor die verwerking gelden hun eigen voorwaarden.</p>
         </section>
 
         <section>
-          <h2>Doeleinden en rechtsgrond van de verwerking</h2>
-          <p>Wij verwerken gegevens uitsluitend voor welbepaalde, uitdrukkelijk omschreven en gerechtvaardigde doeleinden. In het bijzonder verwerken wij gegevens voor de volgende doelen:</p>
+          <h2>Waarom wij deze gegevens nodig hebben (doeleinden)</h2>
+          <p>Wij verwerken jouw (beperkte) gegevens alleen voor de volgende, duidelijk omschreven doeleinden:</p>
           <ul>
-            <li><strong>Extensie (lokaal):</strong> Het bijhouden en tonen van je voortgang, achievements, streaks en statistieken binnen Smartschool, zodat je gemotiveerd wordt en inzicht krijgt in je leeractiviteiten.</li>
-            <li><strong>Leaderboard (optioneel):</strong> Het aanmaken en onderhouden van een publieke ranglijst waarop gebruikers (via een anonieme client-ID en gekozen weergavenaam) hun XP-score kunnen vergelijken met andere deelnemers.</li>
-            <li><strong>Optionele authenticatie:</strong> Indien Supabase OAuth-authenticatie wordt gebruikt, is dit met als doel een veilig en betrouwbaar inlogsysteem aan te bieden voor het beheren van je leaderboard-profiel.</li>
+            <li><strong>Gamificatie en inzicht (extensie lokaal):</strong> het berekenen en tonen van badges, achievements, streaks en statistieken zodat je wordt gemotiveerd en inzicht krijgt in je eigen leeractiviteit.</li>
+            <li><strong>Publiek leaderboard (optioneel):</strong> het tonen van een ranglijst op de website met XP-scores, gekoppeld aan een anonieme client-ID en jouw gekozen weergavenaam.</li>
+            <li><strong>Beveiliging en misbruikpreventie:</strong> het beschermen van onze diensten tegen misbruik, spam of aanvallen (bijvoorbeeld rate-limiting of het blokkeren van verdachte verzoeken via de backend).</li>
+            <li><strong>Verbetering van de dienst:</strong> het technisch beheren, onderhouden en verbeteren van de extensie en website (bugfixes, performance-verbeteringen, nieuwe features).</li>
           </ul>
-          <p>De rechtsgrond voor deze verwerkingen is in de meeste gevallen jouw <strong>toestemming</strong> (artikel 6, lid 1, onder a, AVG), bijvoorbeeld wanneer je ervoor kiest om je gegevens naar het leaderboard te uploaden of in te loggen via een externe provider.</p>
-          <p>Voor de puur lokale verwerking binnen de extensie vertrouwen wij daarnaast op jouw <strong>gerechtvaardigd belang</strong> (artikel 6, lid 1, onder f, AVG) om je eigen leerprestaties te monitoren en te gamificeren, zonder dat hierbij gegevens aan ons of andere derde partijen worden doorgegeven.</p>
+          <p>Wij gebruiken jouw gegevens niet voor advertentiedoeleinden, profilering voor marketing of het verkopen van data aan derden.</p>
+        </section>
+
+        <section>
+          <h2>Rechtsgrond van de verwerking</h2>
+          <p>Volgens de AVG mogen wij persoonsgegevens alleen verwerken als er een geldige rechtsgrond is. Voor Smartschool Achievements baseren wij ons op:</p>
+          <ul>
+            <li><strong>Toestemming (artikel 6, lid 1, a AVG):</strong> voor deelname aan het leaderboard en eventuele optionele OAuth-inlog via Supabase. Jij kiest er zelf voor om je gegevens te uploaden; dit is geen vereiste om de extensie lokaal te gebruiken.</li>
+            <li><strong>Gerechtvaardigd belang (artikel 6, lid 1, f AVG):</strong> voor de lokale verwerking in de extensie op jouw apparaat, met als belang het aanbieden van een motiverende gamification-laag bovenop Smartschool, zonder dat wij de onderliggende schoolgegevens zelf inzien.</li>
+          </ul>
+          <p>Waar we op gerechtvaardigd belang steunen, maken we een belangenafweging om te toetsen dat jouw privacybelang niet zwaarder weegt dan ons belang bij de verwerking.</p>
         </section>
 
         <section>
           <h2>Hoe wij gegevens opslaan en beveiligen</h2>
-          <p><strong>Extensie:</strong> De gegevens die de extensie verzamelt (zoals sessies, opdrachten, streaks en XP) worden opgeslagen via de Chrome Storage API of een gelijkwaardige opslagmethode in jouw browser. Deze gegevens blijven op jouw apparaat en worden niet standaard naar onze servers of andere externe diensten verstuurd. Je hebt zelf de mogelijkheid deze gegevens te wissen door de extensiegegevens te verwijderen of je browsergegevens te wissen.</p>
-          <p><strong>Leaderboard en backend:</strong> De optioneel doorgestuurde gegevens (anonieme client-ID, weergavenaam en XP-score) worden opgeslagen in onze database-instantie bij Supabase. Wij nemen passende technische en organisatorische maatregelen om deze gegevens te beveiligen tegen ongeoorloofde toegang, verlies, misbruik of wijziging, rekening houdend met de stand van de techniek en de aard van de gegevens.</p>
-          <p>De toegang tot de backend is beperkt tot bevoegde personen en accounts die deze gegevens alleen gebruiken voor het beheren en verbeteren van de dienst (bijvoorbeeld het oplossen van technische problemen of het beschermen tegen misbruik).</p>
+          <p><strong>Extensie (lokaal):</strong> Gegevens worden opgeslagen via de Chrome Storage API of een vergelijkbare browser-opslag (bijvoorbeeld in andere Chromium-gebaseerde browsers). Deze data blijft op jouw apparaat en wordt niet automatisch met ons gedeeld. Je kunt deze gegevens wissen door de extensie te verwijderen of de opslag van de extensie/browsersessie te resetten.</p>
+          <p><strong>Backend / Supabase:</strong> De gegevens die voor het leaderboard nodig zijn (client-ID, weergavenaam, XP) worden opgeslagen in een database bij Supabase. Toegang tot deze gegevens is beperkt tot daarvoor geautoriseerde accounts. We gebruiken beveiligde verbindingen (HTTPS) voor transport en machtigen alleen noodzakelijke services.</p>
+          <p>Wij beperken de hoeveelheid data tot wat strikt noodzakelijk is (dataminimalisatie) en loggen geen gevoelige persoonsgegevens.</p>
         </section>
 
         <section>
-          <h2>Bewaartermijnen</h2>
-          <p><strong>Lokaal in de extensie:</strong> Gegevens die lokaal worden opgeslagen in jouw browser worden bewaard zolang de extensie geïnstalleerd en actief is, of totdat jij deze handmatig verwijdert (via extensie-instellingen of het wissen van browsergegevens). Wij hebben zelf geen directe controle over deze lokale opslag.</p>
-          <p><strong>Leaderboard-gegevens:</strong> Gegevens die je vrijwillig naar het leaderboard hebt geüpload, worden bewaard zolang jouw account of client-ID actief is en zolang dit nodig is voor het doel van het leaderboard. Indien je verzoekt om verwijdering (zie “Je rechten onder de AVG”), zullen wij in de regel je client-ID, weergavenaam en XP-score binnen een redelijke termijn verwijderen of anonimiseren.</p>
-          <p>Wij bewaren gegevens nooit langer dan noodzakelijk is voor de doeleinden waarvoor ze zijn verzameld, tenzij wij wettelijk verplicht zijn om een langere bewaartermijn aan te houden.</p>
+          <h2>Hoe lang wij gegevens bewaren</h2>
+          <p>De AVG vereist dat persoonsgegevens niet langer worden bewaard dan nodig is voor het doel waarvoor ze zijn verzameld.</p>
+
+          <p><strong>Lokaal in de extensie:</strong></p>
+          <ul>
+            <li>Gegevens in jouw browser worden bewaard zolang de extensie geïnstalleerd en ingeschakeld is, en</li>
+            <li>zolang jij de browser- of extensiegegevens niet handmatig wist.</li>
+          </ul>
+          <p>Als je de extensie verwijdert of je browserprofiel wist, verdwijnen de lokaal opgeslagen prestaties en achievements. Wij hebben geen toegang tot deze lokale opslag en kunnen die niet voor je herstellen.</p>
+
+          <p><strong>Leaderboard-gegevens (Supabase):</strong></p>
+          <ul>
+            <li>Wij bewaren je client-ID, weergavenaam en XP zolang jouw profiel als “actief” in onze leaderboard-database staat. Dat betekent dat deze gegevens in de database kunnen blijven staan, ook als je de extensie intussen hebt verwijderd of feitelijk niet meer meedoet.</li>
+            <li>We gebruiken deze gegevens dan uitsluitend nog voor het historische leaderboard, basale beveiliging en foutopsporing, en niet voor marketing.</li>
+            <li>Je kunt op elk moment verzoeken om je leaderboard-profiel te laten verwijderen of anonimiseren (zie “Je rechten onder de AVG”). Na zo’n verzoek zullen we je gegevens in principe binnen 30 dagen verwijderen of onomkeerbaar anonimiseren, tenzij we ze op grond van een wettelijke plicht langer moeten bewaren.</li>
+            <li>We kunnen daarnaast zelf een redelijke inactieve periode instellen (bijvoorbeeld wanneer er gedurende langere tijd geen nieuwe scores zijn), waarna oude leaderboard-profielen automatisch worden verwijderd of geanonimiseerd. Als we zo’n automatische termijn invoeren of wijzigen, zullen we dat in dit privacybeleid vermelden.</li>
+          </ul>
+
+          <p>Technische logs bij Supabase of andere hostingpartijen (zoals fout- en beveiligingslogs) kunnen korter of langer worden bewaard, bijvoorbeeld enkele dagen tot enkele maanden, uitsluitend voor beveiliging, auditing en probleemoplossing volgens hun eigen beleid.</p>
         </section>
 
         <section>
-          <h2>Cookies en trackingtechnologieën</h2>
-          <p>Wij plaatsen zelf geen aanvullende trackingcookies of vergelijkbare trackingtechnologieën via de extensie of website voor advertentiedoeleinden. Wij gebruiken geen eigen advertentienetwerken of profiling op basis van het gebruik van de extensie.</p>
-          <p>Het is echter mogelijk dat Smartschool, jouw onderwijsinstelling of Supabase (of andere technische dienstverleners) standaard cookies plaatst die nodig zijn voor het functioneren van hun platform, beveiliging, sessiebeheer of analytische doeleinden. Voor informatie over die cookies en verwerkingen verwijzen wij naar de privacy- en cookieverklaringen van deze derde partijen.</p>
+          <h2>Cookies en soortgelijke technologieën</h2>
+          <p><strong>Eigen cookies:</strong> De Smartschool Achievements-extensie plaatst zelf geen trackingcookies voor marketing of advertentiedoeleinden. De extensie kan wel gebruikmaken van lokale opslag of extensie-opslag om jouw instellingen en voortgang te onthouden; deze opslag is noodzakelijk voor de werking van de extensie.</p>
+          <p><strong>Cookies van derden:</strong></p>
+          <ul>
+            <li><strong>Smartschool en je school:</strong> De Smartschool-omgeving zelf gebruikt cookies voor login, sessiebeheer en mogelijk analytics. Voor die cookies verwijzen we naar de cookie- en privacyverklaringen van Smartschool en jouw onderwijsinstelling.</li>
+            <li><strong>Supabase en hosting:</strong> Onze backend en database (Supabase) kunnen technisch noodzakelijke cookies of vergelijkbare technologieën gebruiken voor beveiliging en sessiebeheer op de website. Deze zijn bedoeld om de site veilig en stabiel te houden.</li>
+          </ul>
+          <p>Als we in de toekomst analytische of marketingcookies van derden zouden inzetten via de website, zullen we dit duidelijk vermelden, uitleggen waarom dit gebeurt en – indien wettelijk vereist – expliciete toestemming vragen via een cookiebanner voordat dergelijke cookies worden geplaatst.</p>
         </section>
 
         <section>
           <h2>Delen van gegevens met derden</h2>
-          <p>Wij verkopen jouw gegevens niet aan adverteerders en delen geen gebruikersgegevens met externe partijen voor marketingdoeleinden.</p>
-          <p>In de volgende situaties kan er sprake zijn van (beperkte) doorgifte aan derden:</p>
+          <p>Wij verkopen jouw gegevens niet aan adverteerders en delen geen gebruikersgegevens met externe partijen voor hun eigen marketingdoeleinden.</p>
+          <p>Wel kan er sprake zijn van doorgifte aan of inzage door derden in de volgende gevallen:</p>
           <ul>
-            <li><strong>Publieke leaderboard-weergave:</strong> Wanneer je ervoor kiest om deel te nemen aan het leaderboard, worden je gekozen weergavenaam, XP-score en eventuele andere leaderboard-velden publiek weergegeven op de website. Andere bezoekers kunnen deze gegevens inzien, maar zien geen rechtstreeks herleidbare persoonsgegevens zoals je echte naam of e-mailadres, tenzij je deze zelf als weergavenaam gebruikt.</li>
-            <li><strong>Supabase als verwerker:</strong> Wij maken gebruik van Supabase als hosting- en databasedienst. Supabase treedt hierbij op als verwerker in de zin van de AVG; zij verwerken gegevens namens ons en volgens onze instructies. Met Supabase wordt een verwerkersovereenkomst afgesloten of de standaardvoorwaarden worden gevolgd waarin passende waarborgen voor gegevensbescherming zijn opgenomen.</li>
-            <li><strong>Overheidsinstanties en juridische verplichtingen:</strong> In uitzonderlijke gevallen kunnen wij verplicht zijn om gegevens te verstrekken aan bevoegde autoriteiten indien dit wettelijk verplicht is (bijvoorbeeld bij een gerechtelijk bevel of onderzoek).</li>
+            <li><strong>Publiek leaderboard:</strong> Je weergavenaam en XP-score zijn zichtbaar voor iedereen die het leaderboard op de website bezoekt. Gebruik daarom geen echte naam of gevoelige informatie als weergavenaam.</li>
+            <li><strong>Supabase als verwerker:</strong> Supabase verwerkt namens ons leaderboard-gegevens en technische logs. Ze treden hierbij op als verwerker volgens de AVG, onder een verwerkersovereenkomst of gelijkaardige contractuele waarborgen.</li>
+            <li><strong>Andere technische dienstverleners:</strong> Denk aan hostingproviders, monitoring- of foutloggingdiensten, voor zover strikt noodzakelijk voor het functioneren en beveiligen van de dienst.</li>
+            <li><strong>Wettelijke verplichtingen:</strong> Wij kunnen verplicht zijn gegevens te delen met bevoegde (overheids)instanties indien de wet dit vereist of op basis van een gerechtelijk bevel.</li>
           </ul>
         </section>
 
         <section>
           <h2>Internationale doorgifte</h2>
-          <p>Het is mogelijk dat Supabase of andere technische dienstverleners servers of infrastructuur buiten de Europese Economische Ruimte (EER) gebruiken. In dat geval streven wij ernaar dat jouw gegevens uitsluitend worden doorgegeven naar landen of organisaties die een passend beschermingsniveau bieden volgens de AVG (bijvoorbeeld op basis van een adequaatheidsbesluit of het gebruik van standaardcontractbepalingen).</p>
+          <p>Het is mogelijk dat sommige gegevens worden opgeslagen of verwerkt op servers buiten de Europese Economische Ruimte (EER), afhankelijk van de infrastructuur van Supabase en andere dienstverleners.</p>
+          <p>In dat geval streven wij ernaar dat doorgifte alleen plaatsvindt naar landen of partijen die een passend beschermingsniveau bieden volgens de AVG, bijvoorbeeld via een adequaatheidsbesluit van de Europese Commissie of door gebruik te maken van standaardcontractbepalingen (Standard Contractual Clauses).</p>
         </section>
 
         <section>
           <h2>Je rechten onder de AVG</h2>
-          <p>Als betrokkene heb je, voor zover van toepassing, de volgende rechten met betrekking tot jouw persoonsgegevens:</p>
+          <p>Als betrokkene heb je onder de AVG verschillende rechten met betrekking tot jouw persoonsgegevens.</p>
           <ul>
-            <li><strong>Recht op inzage:</strong> Je hebt het recht te vragen of wij persoonsgegevens van je verwerken en, zo ja, inzage te krijgen in die gegevens.</li>
-            <li><strong>Recht op rectificatie:</strong> Je hebt het recht om onjuiste of onvolledige persoonsgegevens te laten corrigeren of aanvullen.</li>
-            <li><strong>Recht op verwijdering:</strong> Je kunt verzoeken om verwijdering van jouw persoonsgegevens, bijvoorbeeld wanneer de gegevens niet langer nodig zijn voor de doeleinden waarvoor ze zijn verzameld of wanneer je jouw toestemming intrekt.</li>
-            <li><strong>Recht op beperking van de verwerking:</strong> In bepaalde gevallen kun je vragen om de verwerking van je gegevens tijdelijk te beperken.</li>
-            <li><strong>Recht op bezwaar:</strong> Je hebt het recht bezwaar te maken tegen verwerkingen die zijn gebaseerd op ons gerechtvaardigd belang.</li>
-            <li><strong>Recht op gegevensoverdraagbaarheid:</strong> Voor zover technisch haalbaar kun je vragen om de gegevens die je zelf aan ons hebt verstrekt in een gestructureerd, gangbaar en machineleesbaar formaat te ontvangen of deze rechtstreeks aan een andere verwerkingsverantwoordelijke te laten overdragen.</li>
-            <li><strong>Recht om toestemming in te trekken:</strong> Indien de verwerking is gebaseerd op jouw toestemming, kun je deze toestemming op elk moment intrekken. Dit doet geen afbreuk aan de rechtmatigheid van de verwerking vóór intrekking.</li>
+            <li><strong>Recht op informatie:</strong> Je hebt het recht om te weten welke gegevens wij verwerken, waarom en hoe lang, zoals uiteengezet in dit privacybeleid.</li>
+            <li><strong>Recht op inzage:</strong> Je kunt ons vragen of wij persoonsgegevens van jou verwerken en, zo ja, inzage vragen in die gegevens.</li>
+            <li><strong>Recht op rectificatie:</strong> Als gegevens onjuist of onvolledig zijn, mag je vragen deze te verbeteren of aan te vullen.</li>
+            <li><strong>Recht op gegevenswissing (“recht om vergeten te worden”):</strong> Je kunt in bepaalde gevallen vragen om je gegevens te verwijderen, bijvoorbeeld wanneer ze niet langer nodig zijn voor het doel of wanneer je je toestemming intrekt.</li>
+            <li><strong>Recht op beperking van de verwerking:</strong> Je kunt in specifieke situaties vragen om de verwerking tijdelijk te beperken, bijvoorbeeld terwijl de juistheid van gegevens wordt onderzocht.</li>
+            <li><strong>Recht op bezwaar:</strong> Je mag bezwaar maken tegen verwerkingen die zijn gebaseerd op ons gerechtvaardigd belang.</li>
+            <li><strong>Recht op gegevensoverdraagbaarheid:</strong> Voor gegevens die je zelf actief aan ons hebt verstrekt op basis van toestemming of overeenkomst, mag je vragen om deze in een gestructureerd, gangbaar en machineleesbaar formaat te ontvangen, of om deze – indien technisch haalbaar – over te dragen aan een andere verwerkingsverantwoordelijke.</li>
+            <li><strong>Recht om toestemming in te trekken:</strong> Wanneer de verwerking op jouw toestemming is gebaseerd, kun je deze op elk moment intrekken. Dit heeft geen invloed op de rechtmatigheid van de verwerking vóór de intrekking.</li>
           </ul>
-          <p><strong>Lokaal in de extensie:</strong> Voor de gegevens die uitsluitend lokaal in jouw browser worden opgeslagen, kun je deze rechten in de praktijk uitoefenen door de extensie te verwijderen of de opgeslagen extensie-/browsergegevens te wissen. Hierdoor worden de lokale statistieken en achievements gewist.</p>
-          <p><strong>Leaderboard / Supabase:</strong> Als je jouw gegevens op het leaderboard wilt inzien, corrigeren of laten verwijderen, kun je contact met ons opnemen (zie “Contact”). Wij zullen je verzoek zo snel mogelijk en binnen de wettelijke termijnen behandelen.</p>
-          <p>Daarnaast heb je het recht een klacht in te dienen bij de toezichthoudende autoriteit voor gegevensbescherming in jouw land. In België is dit de Gegevensbeschermingsautoriteit (GBA) te Brussel (drukpersstraat 35, 1000 Brussel, dataprotectionauthority.be).</p>
+          <p><strong>Lokaal in de extensie:</strong> Voor data die alleen lokaal in jouw browser staat (achievements, streaks, statistieken) oefen je je rechten vooral uit door de extensie te verwijderen of de lokale opslag te wissen. Wij kunnen die data technisch gezien niet zelf voor je inzien of verwijderen.</p>
+          <p><strong>Leaderboard / Supabase:</strong> Wil je jouw leaderboard-gegevens (client-ID, weergavenaam, XP) inzien, aanpassen of verwijderen, neem dan contact met ons op via de Discord-community (zie “Contact”). Wij behandelen je verzoek zo snel mogelijk en in ieder geval binnen de wettelijke termijn.</p>
+          <p>Daarnaast heb je het recht om een klacht in te dienen bij de toezichthoudende autoriteit. In België is dat de Gegevensbeschermingsautoriteit (GBA), Drukpersstraat 35, 1000 Brussel, via <a href="https://www.gegevensbeschermingsautoriteit.be" target="_blank" rel="noreferrer">gegevensbeschermingsautoriteit.be</a>.</p>
         </section>
 
         <section>
           <h2>Kinderen, scholieren en educatieve context</h2>
-          <p>Smartschool Achievements is in de eerste plaats ontwikkeld voor gebruik in een educatieve context, met name door scholieren en leerlingen die Smartschool gebruiken. Wij streven ernaar om de verwerking van persoonsgegevens zoveel mogelijk te beperken en anonimiteit te waarborgen, zeker bij minderjarigen.</p>
-          <p>De installatie en het beheer van de extensie kunnen in de praktijk worden uitgevoerd door leerlingen zelf, ouders/voogden of IT-beheerders van scholen. Wij adviseren ouders, voogden en scholen om toezicht te houden op het gebruik van de extensie en om leerlingen te begeleiden bij het kiezen van een veilige weergavenaam (zonder volledige naam of andere gevoelige informatie).</p>
-          <p>Wij vragen geen bewuste verzameling van gevoelige persoonsgegevens (zoals gezondheidsgegevens, religie, etniciteit, etc.) en verzoeken gebruikers om dergelijke informatie niet in hun weergavenaam of andere velden op te nemen.</p>
+          <p>Smartschool Achievements is bedoeld voor gebruik in een leeromgeving, veelal door minderjarige scholieren. Daarom proberen we de hoeveelheid en gevoeligheid van de verwerkte gegevens zoveel mogelijk te beperken en anonimiteit te bevorderen.</p>
+          <p>De installatie en het gebruik van de extensie kunnen door leerlingen zelf, ouders/voogden of IT-beheerders gebeuren. We raden scholen, ouders en voogden aan om met leerlingen af te spreken dat zij geen volledige namen, klasgroepen of andere herleidbare informatie als weergavenaam gebruiken op het leaderboard.</p>
+          <p>Wij vragen niet om bijzondere categorieën van persoonsgegevens (zoals gezondheidsgegevens, religie of etniciteit) en vragen gebruikers om dergelijke informatie niet in namen, profielfields of berichten op te nemen.</p>
         </section>
 
         <section>
           <h2>Beveiliging</h2>
-          <p>Wij nemen redelijke technische en organisatorische maatregelen om jouw gegevens te beschermen tegen ongeoorloofde toegang, verlies, vernietiging of wijziging. Dit omvat onder andere toegangsbeperkingen tot databases, gebruik van beveiligde verbindingen waar mogelijk en een minimale gegevensverwerking (data minimalisatie).</p>
-          <p>Geen enkel systeem is echter volledig beveiligd. Hoewel wij ernaar streven passende beveiliging te bieden, kunnen wij geen absolute veiligheid garanderen. Wij raden je daarom aan om zelf ook zorgvuldig om te gaan met je apparaten, accounts en extensies.</p>
+          <p>We nemen passende technische en organisatorische maatregelen om jouw gegevens te beschermen tegen ongeoorloofde toegang, verlies, vernietiging of wijziging. Denk aan het beperken van toegangsrechten, het gebruik van beveiligde verbindingen (HTTPS) en het beperken van de hoeveelheid opgeslagen gegevens.</p>
+          <p>Geen enkel systeem is echter volledig veilig. Hoewel we ons best doen om een hoog beveiligingsniveau te bieden, kunnen we geen absolute veiligheid garanderen. We raden je aan om zelf ook zorgvuldig om te gaan met je apparaat, browserprofiel, wachtwoorden en extensies.</p>
         </section>
 
         <section>
           <h2>Wijzigingen in dit privacybeleid</h2>
-          <p>Wij behouden ons het recht voor om dit privacybeleid van tijd tot tijd te wijzigen of aan te vullen, bijvoorbeeld om te voldoen aan gewijzigde wetgeving of om onze diensten te verbeteren. De datum van de laatste wijziging staat bovenaan dit document vermeld.</p>
-          <p>Wanneer wij wezenlijke wijzigingen aanbrengen, zullen wij dit waar mogelijk kenbaar maken via de website of andere geschikte middelen. Wij raden je aan dit privacybeleid regelmatig te raadplegen om op de hoogte te blijven van eventuele wijzigingen.</p>
+          <p>Wij kunnen dit privacybeleid van tijd tot tijd aanpassen, bijvoorbeeld wanneer onze dienst wijzigt of als de wetgeving daarom vraagt. Bovenaan dit document zie je altijd de datum van de laatste wijziging.</p>
+          <p>Bij belangrijke wijzigingen zullen we proberen dit duidelijk kenbaar te maken, bijvoorbeeld via de website of een melding. We raden je aan dit privacybeleid regelmatig opnieuw te bekijken.</p>
         </section>
 
         <section>
           <h2>Contact</h2>
-          <p>Als je vragen, opmerkingen of verzoeken hebt met betrekking tot dit privacybeleid of de verwerking van jouw gegevens, kun je contact met ons opnemen via onze community:</p>
+          <p>Heb je vragen, opmerkingen of wil je een verzoek uitoefenen rond jouw privacyrechten, dan kun je contact met ons opnemen via onze community:</p>
           <p><a href="https://discord.gg/upmbz82Ffb">Discord-server Smartschool Achievements</a></p>
-          <p>Of via email: official.superman2775@gmail.com</p>
-          <p>Indien nodig kun je ook contact opnemen met jouw onderwijsinstelling voor vragen over de verwerking van persoonsgegevens binnen Smartschool zelf.</p>
-          <p>Let op: de informatie in dit privacybeleid is uitsluitend bedoeld als algemene informatie en vormt geen vervanging voor professioneel juridisch advies. Voor een sluitende en volledig op jouw situatie afgestemde privacydocumentatie raden wij aan om een juridisch expert of privacyprofessional te raadplegen.</p>
+          <p>Voor vragen over de verwerking van persoonsgegevens binnen Smartschool zelf (zoals punten, aanwezigheid, schoolaccount) kun je het best contact opnemen met jouw school of de beheerder van Smartschool.</p>
+          <p>Let op: de informatie in dit privacybeleid is bedoeld als algemene toelichting en vormt geen formeel juridisch advies. Voor een volledig op maat gemaakte en juridisch sluitende analyse raden wij aan om een gespecialiseerde jurist of privacyprofessional te raadplegen.</p>
         </section>
       </section>
 
